@@ -1,12 +1,12 @@
 // TODO: Don't forget to add 42 header !
 
+#ifndef DIRECTORY_HPP
+#define DIRECTORY_HPP
+
 /**
  * @file Directory.hpp
  * @brief
  */
-
-#ifndef DIRECTORY_HPP
-#define DIRECTORY_HPP
 
 #include <dirent.h>
 #include <string>
