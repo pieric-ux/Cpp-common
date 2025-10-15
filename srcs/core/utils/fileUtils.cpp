@@ -11,6 +11,8 @@ namespace common
 {
 namespace core
 {
+namespace utils
+{
 
 /**
  * @brief 
@@ -56,5 +58,6 @@ std::string	filenameNoPath(const std::string &path)
 	return (path.substr(pos + 1));
 }
 
+} // !utils
 } // !core
 } // !common

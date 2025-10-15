@@ -11,6 +11,10 @@
 #include <string>
 #include <ctime>
 
+namespace common
+{
+namespace core
+{
 namespace utils
 {
 
@@ -20,5 +24,7 @@ double		relativeSec(const clock_t &startTime);
 std::string	timestamp(const time_t &time);
 
 } // !utils
+} // !core
+} // !common
 
 #endif // !TIMEUTILS_HPP
