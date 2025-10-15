@@ -1,8 +1,18 @@
-// TODO: Don't forget to add 42 header !
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Directory.cpp                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
+/*                                                     #+#    #+#             */
+/*   Created: 2025/10/16                              ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 /**
  * @file Directory.cpp
- * @brief
+ * @brief Implementation of the Directory and DirectoryIterator classes for directory traversal utilities.
  */
 
 #include "common/core/utils/Directory.hpp"
@@ -21,9 +31,10 @@ namespace utils
 {
 
 /**
- * @brief 
+ * @brief Constructs a Directory object and opens the specified directory.
  *
- * @param filename 
+ * @param filename Path to the directory to open.
+ * @throws std::runtime_error If the directory cannot be opened.
  */
 Directory::Directory(const std::string &filename) : dir(NULL)
 {
@@ -34,7 +45,7 @@ Directory::Directory(const std::string &filename) : dir(NULL)
 }
 
 /**
- * @brief 
+ * @brief Destructor for Directory. Closes the opened directory if necessary.
  */
 Directory::~Directory()
 {
@@ -43,9 +54,9 @@ Directory::~Directory()
 }
 
 /**
- * @brief 
+ * @brief Returns an iterator to the beginning of the directory.
  *
- * @return 
+ * @return DirectoryIterator pointing to the first entry.
  */
 DirectoryIterator	Directory::begin()
 {
@@ -53,9 +64,9 @@ DirectoryIterator	Directory::begin()
 }
 
 /**
- * @brief 
+ * @brief Returns an iterator to the end of the directory.
  *
- * @return 
+ * @return DirectoryIterator representing the end.
  */
 DirectoryIterator	Directory::end()
 {
@@ -63,9 +74,9 @@ DirectoryIterator	Directory::end()
 }
 
 /**
- * @brief 
+ * @brief Gets the underlying DIR pointer.
  *
- * @return 
+ * @return Pointer to DIR structure.
  */
 DIR *Directory::getDir() const
 {
@@ -73,10 +84,10 @@ DIR *Directory::getDir() const
 }
 
 /**
- * @brief 
+ * @brief Creates a directory if it does not exist.
  *
- * @param filename 
- * @return 
+ * @param filename Path to the directory to create.
+ * @throws std::runtime_error If the path exists but is not a directory, or if creation fails.
  */
 void	Directory::create(const std::string &filename)
 {
@@ -95,14 +106,14 @@ void	Directory::create(const std::string &filename)
 }
 
 /**
- * @brief 
+ * @brief Default constructor for DirectoryIterator. Creates an end iterator.
  */
 DirectoryIterator::DirectoryIterator() : dir(NULL), entry(NULL) {}
 
 /**
- * @brief 
+ * @brief Constructs a DirectoryIterator for the given Directory.
  *
- * @param init_dir 
+ * @param init_dir Pointer to the Directory to iterate.
  */
 DirectoryIterator::DirectoryIterator(Directory *init_dir) : dir(init_dir), entry(NULL)
 {
@@ -111,22 +122,22 @@ DirectoryIterator::DirectoryIterator(Directory *init_dir) : dir(init_dir), entry
 }
 
 /**
- * @brief 
+ * @brief Destructor for DirectoryIterator.
  */
 DirectoryIterator::~DirectoryIterator() {}
 
 /**
- * @brief 
+ * @brief Copy constructor for DirectoryIterator.
  *
- * @param rhs 
+ * @param rhs DirectoryIterator to copy from.
  */
 DirectoryIterator::DirectoryIterator(const DirectoryIterator &rhs) : dir(rhs.dir), entry(rhs.entry) {}
 
 /**
- * @brief 
+ * @brief Assignment operator for DirectoryIterator.
  *
- * @param rhs 
- * @return 
+ * @param rhs DirectoryIterator to assign from.
+ * @return Reference to this iterator.
  */
 DirectoryIterator	&DirectoryIterator::operator=(const DirectoryIterator &rhs)
 {
@@ -139,9 +150,9 @@ DirectoryIterator	&DirectoryIterator::operator=(const DirectoryIterator &rhs)
 }
 
 /**
- * @brief 
+ * @brief Dereference operator.
  *
- * @return 
+ * @return Pointer to the current dirent structure.
  */
 struct dirent *DirectoryIterator::operator*() const
 {
@@ -149,9 +160,10 @@ struct dirent *DirectoryIterator::operator*() const
 }
 
 /**
- * @brief 
+ * @brief Pre-increment operator. Advances to the next directory entry.
  *
- * @return 
+ * @return Reference to this iterator.
+ * @throws std::runtime_error If reading the directory fails.
  */
 DirectoryIterator &DirectoryIterator::operator++()
 {
@@ -166,9 +178,9 @@ DirectoryIterator &DirectoryIterator::operator++()
 }
 
 /**
- * @brief 
+ * @brief Post-increment operator. Advances to the next directory entry.
  *
- * @return 
+ * @return Copy of the iterator before increment.
  */
 DirectoryIterator DirectoryIterator::operator++(int)
 {
@@ -178,10 +190,10 @@ DirectoryIterator DirectoryIterator::operator++(int)
 }
 
 /**
- * @brief 
+ * @brief Inequality comparison operator.
  *
- * @param rhs 
- * @return 
+ * @param rhs DirectoryIterator to compare with.
+ * @return True if iterators are not equal, false otherwise.
  */
 bool DirectoryIterator::operator!=(const DirectoryIterator &rhs) const
 {

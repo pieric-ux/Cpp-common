@@ -1,11 +1,24 @@
-// TODO: Don't forget to add 42 header !
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   common.hpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
+/*                                                     #+#    #+#             */
+/*   Created: 2025/10/16                              ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #ifndef COMMON_HPP
 #define COMMON_HPP
 
 /**
  * @file common.hpp
- * @brief
+ * @brief Common header aggregating core utilities and loader functionality.
+ *
+ * This header includes various utility and RAII classes, as well as the loader interface,
+ * to provide convenient access to commonly used components throughout the project.
  */
 
 #include "common/core/raii/Deleters.hpp"

@@ -1,8 +1,18 @@
-// TODO: Don't forget to add 42 header !
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Loader.hpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
+/*                                                     #+#    #+#             */
+/*   Created: 2025/10/16                              ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 /**
  * @file Loader.hpp
- * @brief
+ * @brief Declaration of the Loader class for loading and parsing files from directories.
  */
 
 #ifndef LOADER_HPP
@@ -16,6 +26,13 @@ namespace common
 namespace loader
 {
 
+/**
+ * @class Loader
+ * @brief Utility class for loading files from directories and parsing them.
+ *
+ * The Loader class provides methods to iterate over files in a directory with a specific extension,
+ * and to apply a user-provided parser function to each file.
+ */
 class Loader
 {
 	public:

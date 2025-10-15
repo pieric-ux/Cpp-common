@@ -1,19 +1,31 @@
-// TODO: Don't forget to add 42 header !
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Deleters.hpp                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
+/*                                                     #+#    #+#             */
+/*   Created: 2025/10/16                              ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #ifndef DELETERS_HPP
 #define DELETERS_HPP
 
 /**
- * @file UniquePtr.hpp
- * @brief
+ * @file Deleters.hpp
+ * @brief Default deleter functors for use with smart pointers.
  */
 
 /**
- * @brief 
- *
- * @tparam T 
- * @param ptr 
- */
+* @struct DefaultDelete
+* @brief Default deleter for single objects.
+*
+* Provides a function call operator to delete a pointer to a single object.
+*
+* @tparam T Type of the object to delete.
+*/
 template<typename T>
 struct DefaultDelete
 {
@@ -21,10 +33,12 @@ struct DefaultDelete
 };
 
 /**
- * @brief 
+ * @struct DefaultDelete<T[]>
+ * @brief Default deleter specialization for arrays.
  *
- * @tparam T 
- * @param ptr 
+ * Provides a function call operator to delete a pointer to an array.
+ *
+ * @tparam T Type of the array elements to delete.
  */
 template<typename T>
 struct DefaultDelete<T[]>

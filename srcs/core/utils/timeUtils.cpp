@@ -1,8 +1,18 @@
-// TODO: Don't forget to add 42 header !
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   timeUtils.cpp                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
+/*                                                     #+#    #+#             */
+/*   Created: 2025/10/16                              ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 /**
  * @file timeUtils.cpp
- * @brief
+ * @brief Utility functions for retrieving and manipulating time values.
  */ 
 
 #include "sys/time.h"
@@ -17,9 +27,9 @@ namespace utils
 {
 
 /**
- * @brief 
+ * @brief Get the current time in seconds since the Unix epoch.
  *
- * @return 
+ * @return Current time as std::time_t (seconds since epoch).
  */
 std::time_t	nowSec()
 {
@@ -27,9 +37,9 @@ std::time_t	nowSec()
 }
 
 /**
- * @brief 
+ * @brief Get the current time in milliseconds.
  *
- * @return 
+ * @return Current time in milliseconds (0-999) within the current second.
  */
 long	nowMilli()
 {
@@ -40,10 +50,10 @@ long	nowMilli()
 }
 
 /**
- * @brief 
+ * @brief Get the elapsed time in seconds since a given clock tick.
  *
- * @param startTime 
- * @return 
+ * @param startTime The starting clock tick (from std::clock()).
+ * @return Elapsed time in seconds as a double.
  */
 double	relativeSec(const clock_t &startTime)
 {

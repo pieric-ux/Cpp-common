@@ -1,11 +1,21 @@
-// TODO: Don't forget to add 42 header !
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Directory.hpp                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
+/*                                                     #+#    #+#             */
+/*   Created: 2025/10/16                              ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #ifndef DIRECTORY_HPP
 #define DIRECTORY_HPP
 
 /**
  * @file Directory.hpp
- * @brief
+ * @brief Directory traversal utilities for iterating and manipulating directories.
  */
 
 #include <dirent.h>
@@ -20,6 +30,12 @@ namespace utils
 
 class DirectoryIterator;
 
+/**
+ * @class Directory
+ * @brief RAII wrapper for directory operations.
+ *
+ * Provides methods to open, iterate, and create directories using POSIX APIs.
+ */
 class Directory
 {
 	public:
@@ -40,6 +56,12 @@ class Directory
 		Directory &operator=(const Directory &rhs);
 };
 
+/**
+ * @class DirectoryIterator
+ * @brief Iterator for traversing directory entries.
+ *
+ * Provides standard iterator operations for iterating over directory entries.
+ */
 class DirectoryIterator
 {
 	public:

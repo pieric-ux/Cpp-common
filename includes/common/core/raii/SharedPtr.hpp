@@ -1,15 +1,26 @@
-// TODO: Don't forget to add 42 header !
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   SharedPtr.hpp                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
+/*                                                     #+#    #+#             */
+/*   Created: 2025/10/16                              ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #ifndef SHAREDPTR_HPP
 #define SHAREDPTR_HPP
 
 /**
  * @file SharedPtr.hpp
- * @brief
+ * @brief Implementation of a reference-counted shared ownership smart pointer 
+ * with customizable deleter.
  */
 
-#include "../utils/algoUtils.hpp"
-#include "../raii/Deleters.hpp"
+#include "common/core/utils/algoUtils.hpp"
+#include "common/core/raii/Deleters.hpp"
 #include <cstddef>
 
 namespace common
@@ -19,6 +30,15 @@ namespace core
 namespace raii
 {
 
+/**
+ * @class SharedPtrBase
+ * @brief Base class for reference-counted shared ownership smart pointers.
+ *
+ * Manages a pointer, a deleter, and a reference count for shared ownership.
+ *
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor.
+ */
 template<typename T, typename Deleter>
 class SharedPtrBase
 {
@@ -46,12 +66,13 @@ class SharedPtrBase
 };
 
 /**
- * @brief 
+ * @class SharedPtr
+ * @brief Reference-counted shared ownership smart pointer for single objects.
  *
- * @tparam T 
- * @param ptr 
- * @param deleters 
- * @return 
+ * Provides shared ownership semantics for a dynamically allocated object.
+ *
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor (default: DefaultDelete<T>).
  */
 template<typename T, typename Deleter = DefaultDelete<T> >
 class SharedPtr : public SharedPtrBase<T, Deleter>
@@ -74,13 +95,13 @@ class SharedPtr : public SharedPtrBase<T, Deleter>
 };
 
 /**
- * @brief 
+ * @class SharedPtr<T[], Deleter>
+ * @brief Reference-counted shared ownership smart pointer specialization for arrays.
  *
- * @tparam T 
- * @tparam Deleter 
- * @param ptr 
- * @param deleters 
- * @return 
+ * Provides shared ownership semantics for a dynamically allocated array.
+ *
+ * @tparam T Type of the managed array elements.
+ * @tparam Deleter Type of the deleter functor.
  */
 template<typename T, typename Deleter>
 class SharedPtr<T[], Deleter> : SharedPtrBase<T, Deleter>
@@ -102,13 +123,12 @@ class SharedPtr<T[], Deleter> : SharedPtrBase<T, Deleter>
 };
 
 /**
- * @brief 
+ * @brief Constructs a SharedPtrBase with a pointer and deleter.
  *
- * @tparam T 
- * @tparam Deleter 
- * @param ptr 
- * @param deleter 
- * @return 
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor.
+ * @param ptr The pointer to manage.
+ * @param deleter The deleter to use.
  */
 template<typename T, typename Deleter>
 SharedPtrBase<T, Deleter>::SharedPtrBase(T *ptr, Deleter deleter) throw() : _ptr(ptr), _deleter(deleter), _count(0)
@@ -118,11 +138,10 @@ SharedPtrBase<T, Deleter>::SharedPtrBase(T *ptr, Deleter deleter) throw() : _ptr
 }
 
 /**
- * @brief 
+ * @brief Destructor. Decrements reference count and deletes managed pointer if needed.
  *
- * @tparam T 
- * @tparam Deleter 
- * @return 
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor.
  */
 template<typename T, typename Deleter>
 SharedPtrBase<T, Deleter>::~SharedPtrBase()
@@ -131,12 +150,11 @@ SharedPtrBase<T, Deleter>::~SharedPtrBase()
 }
 
 /**
- * @brief 
+ * @brief Copy constructor. Increments reference count.
  *
- * @tparam T 
- * @tparam Deleter 
- * @param rhs 
- * @return 
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor.
+ * @param rhs SharedPtrBase to copy from.
  */
 template<typename T, typename Deleter>
 SharedPtrBase<T, Deleter>::SharedPtrBase(const SharedPtrBase &rhs) throw() : _ptr(rhs._ptr), _deleter(rhs._deleter), _count(rhs._count)
@@ -146,12 +164,12 @@ SharedPtrBase<T, Deleter>::SharedPtrBase(const SharedPtrBase &rhs) throw() : _pt
 }
 
 /**
- * @brief 
+ * @brief Assignment operator. Handles reference count and pointer management.
  *
- * @tparam T 
- * @tparam Deleter 
- * @param rhs 
- * @return 
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor.
+ * @param rhs SharedPtrBase to assign from.
+ * @return Reference to this instance.
  */
 template<typename T, typename Deleter>
 SharedPtrBase<T, Deleter>	&SharedPtrBase<T, Deleter>::operator=(const SharedPtrBase &rhs) throw()
@@ -169,11 +187,11 @@ SharedPtrBase<T, Deleter>	&SharedPtrBase<T, Deleter>::operator=(const SharedPtrB
 }
 
 /**
- * @brief 
+ * @brief Replaces the managed pointer with a new one, updating reference count and deleting if necessary.
  *
- * @tparam T 
- * @tparam Deleter 
- * @param ptr 
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor.
+ * @param ptr The new pointer to manage.
  */
 template<typename T, typename Deleter>
 void	SharedPtrBase<T, Deleter>::reset(T *ptr) throw()
@@ -199,11 +217,11 @@ void	SharedPtrBase<T, Deleter>::reset(T *ptr) throw()
 }
 
 /**
- * @brief 
+ * @brief Swaps the managed pointer, deleter, and reference count with another SharedPtrBase.
  *
- * @tparam T 
- * @tparam Deleter 
- * @param other 
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor.
+ * @param other The other SharedPtrBase to swap with.
  */
 template<typename T, typename Deleter>
 void	SharedPtrBase<T, Deleter>::swap(SharedPtrBase &other) throw()
@@ -214,11 +232,11 @@ void	SharedPtrBase<T, Deleter>::swap(SharedPtrBase &other) throw()
 }
 
 /**
- * @brief 
+ * @brief Gets the managed pointer.
  *
- * @tparam T 
- * @tparam Deleter 
- * @return 
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor.
+ * @return The managed pointer.
  */
 template<typename T, typename Deleter>
 T	*SharedPtrBase<T, Deleter>::get() const throw()
@@ -227,11 +245,11 @@ T	*SharedPtrBase<T, Deleter>::get() const throw()
 }
 
 /**
- * @brief 
+ * @brief Gets a reference to the deleter.
  *
- * @tparam T 
- * @tparam Deleter 
- * @return 
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor.
+ * @return Reference to the deleter.
  */
 template<typename T, typename Deleter>
 Deleter	&SharedPtrBase<T, Deleter>::getDeleter() throw()
@@ -240,11 +258,11 @@ Deleter	&SharedPtrBase<T, Deleter>::getDeleter() throw()
 }
 
 /**
- * @brief 
+ * @brief Gets a const reference to the deleter.
  *
- * @tparam T 
- * @tparam Deleter 
- * @return 
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor.
+ * @return Const reference to the deleter.
  */
 template<typename T, typename Deleter>
 const Deleter	&SharedPtrBase<T, Deleter>::getDeleter() const throw()
@@ -253,11 +271,11 @@ const Deleter	&SharedPtrBase<T, Deleter>::getDeleter() const throw()
 }
 
 /**
- * @brief 
+ * @brief Gets the number of SharedPtr instances sharing ownership.
  *
- * @tparam T 
- * @tparam Deleter 
- * @return 
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor.
+ * @return Reference count.
  */
 template<typename T, typename Deleter>
 std::size_t		SharedPtrBase<T, Deleter>::useCount() const throw()
@@ -266,11 +284,11 @@ std::size_t		SharedPtrBase<T, Deleter>::useCount() const throw()
 }
 
 /**
- * @brief 
+ * @brief Checks if this is the only SharedPtr owning the managed pointer.
  *
- * @tparam T 
- * @tparam Deleter 
- * @return 
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor.
+ * @return True if unique, false otherwise.
  */
 template<typename T, typename Deleter>
 bool	SharedPtrBase<T, Deleter>::unique() const throw()
@@ -279,11 +297,11 @@ bool	SharedPtrBase<T, Deleter>::unique() const throw()
 }
 
 /**
- * @brief 
- *
- * @tparam T 
- * @tparam Deleter 
- * @return 
+ * @brief Member access operator for SharedPtr.
+ * 
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor.
+ * @return Pointer to the managed object.
  */
 template<typename T, typename Deleter>
 T	*SharedPtr<T, Deleter>::operator->() const throw()
@@ -292,11 +310,11 @@ T	*SharedPtr<T, Deleter>::operator->() const throw()
 }
 
 /**
- * @brief 
+ * @brief Dereference operator for SharedPtr.
  *
- * @tparam T 
- * @tparam Deleter 
- * @return 
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor.
+ * @return Reference to the managed object.
  */
 template<typename T, typename Deleter>
 T	&SharedPtr<T, Deleter>::operator*() const throw()
@@ -305,12 +323,12 @@ T	&SharedPtr<T, Deleter>::operator*() const throw()
 }
 
 /**
- * @brief 
+ * @brief Array subscript operator for SharedPtr<T[], Deleter>.
  *
- * @tparam T 
- * @tparam Deleter 
- * @param i 
- * @return 
+ * @tparam T Type of the managed array elements.
+ * @tparam Deleter Type of the deleter functor.
+ * @param i Index of the element.
+ * @return Reference to the element at index i.
  */
 template<typename T, typename Deleter>
 T	&SharedPtr<T[], Deleter>::operator[](std::size_t i) const

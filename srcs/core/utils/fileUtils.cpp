@@ -1,8 +1,18 @@
-// TODO: Don't forget to add 42 header !
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   fileUtils.cpp                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
+/*                                                     #+#    #+#             */
+/*   Created: 2025/10/16                              ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 /**
  * @file fileUtils.cpp
- * @brief
+ * @brief Utility functions for file name and path manipulations.
  */
 
 #include <string>
@@ -15,11 +25,11 @@ namespace utils
 {
 
 /**
- * @brief 
+ * @brief Checks if a filename ends with the specified extension.
  *
- * @param filename 
- * @param ext 
- * @return 
+ * @param filename The name of the file to check.
+ * @param ext The extension to check for (including the dot, e.g., ".txt").
+ * @return true if the filename ends with the given extension, false otherwise.
  */
 bool	hasExtension(const std::string &filename, const std::string &ext)
 {
@@ -30,11 +40,11 @@ bool	hasExtension(const std::string &filename, const std::string &ext)
 }
 
 /**
- * @brief 
+ * @brief Returns the filename without the specified extension if it exists.
  *
- * @param filename 
- * @param ext 
- * @return 
+ * @param filename The name of the file.
+ * @param ext The extension to remove (including the dot, e.g., ".txt").
+ * @return The filename without the extension, or the original filename if the extension is not present.
  */
 std::string	filenameNoExt(const std::string &filename, const std::string &ext)
 {
@@ -45,10 +55,10 @@ std::string	filenameNoExt(const std::string &filename, const std::string &ext)
 }
 
 /**
- * @brief 
+ * @brief Extracts the filename from a full path.
  *
- * @param path 
- * @return 
+ * @param path The full path to extract the filename from.
+ * @return The filename without the preceding path.
  */
 std::string	filenameNoPath(const std::string &path)
 {

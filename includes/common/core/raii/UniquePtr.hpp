@@ -1,4 +1,14 @@
-// TODO: Don't forget to add 42 header !
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   UniquePtr.hpp                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
+/*                                                     #+#    #+#             */
+/*   Created: 2025/10/16                              ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #ifndef UNIQUEPTR_HPP
 #define UNIQUEPTR_HPP
@@ -8,7 +18,7 @@
  * @brief
  */
 
-#include "../utils/algoUtils.hpp"
+#include "common/core/utils/algoUtils.hpp"
 #include "Deleters.hpp"
 #include <cstddef>
 
@@ -20,11 +30,13 @@ namespace raii
 {
 
 /**
- * @brief 
+ * @class UniquePtrBase
+ * @brief Base class for unique ownership smart pointers.
  *
- * @tparam T 
- * @param ptr 
- * @return 
+ * Manages a pointer and a deleter, providing core unique pointer operations.
+ *
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor.
  */
 template<typename T, typename Deleter>
 class UniquePtrBase
@@ -52,11 +64,13 @@ class UniquePtrBase
 
 
 /**
- * @brief 
+ * @class UniquePtr
+ * @brief Unique ownership smart pointer for single objects.
  *
- * @tparam T 
- * @param ptr 
- * @return 
+ * Provides unique ownership semantics for a dynamically allocated object.
+ *
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor (default: DefaultDelete<T>).
  */
 template<typename T, typename Deleter = DefaultDelete<T> >
 class UniquePtr : public UniquePtrBase<T, Deleter>
@@ -76,13 +90,13 @@ class UniquePtr : public UniquePtrBase<T, Deleter>
 };
 
 /**
- * @brief 
+ * @class UniquePtr<T[], Deleter>
+ * @brief Unique ownership smart pointer specialization for arrays.
  *
- * @tparam T 
- * @tparam Deleter 
- * @param ptr 
- * @param deleter 
- * @return 
+ * Provides unique ownership semantics for a dynamically allocated array.
+ *
+ * @tparam T Type of the managed array elements.
+ * @tparam Deleter Type of the deleter functor.
  */
 template<typename T, typename Deleter>
 class UniquePtr<T[], Deleter> : public UniquePtrBase<T, Deleter>
@@ -100,25 +114,21 @@ class UniquePtr<T[], Deleter> : public UniquePtrBase<T, Deleter>
 		UniquePtr &operator=(const UniquePtr &rhs);
 };
 
-
 /**
- * @brief 
- *
- * @tparam T 
- * @tparam Deleter 
- * @param ptr 
- * @param deleter 
- * @return 
+ * @brief Constructs a UniquePtrBase with a pointer and deleter.
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor.
+ * @param ptr The pointer to manage.
+ * @param deleter The deleter to use.
  */
 template<typename T, typename Deleter>
 UniquePtrBase<T, Deleter>::UniquePtrBase(T *ptr, Deleter deleter) throw() : _ptr(ptr), _deleter(deleter) {}
 
 /**
- * @brief 
+ * @brief Destructor. Deletes the managed pointer using the deleter.
  *
- * @tparam T 
- * @tparam Deleter 
- * @return 
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor.
  */
 template<typename T, typename Deleter>
 UniquePtrBase<T, Deleter>::~UniquePtrBase()
@@ -128,11 +138,11 @@ UniquePtrBase<T, Deleter>::~UniquePtrBase()
 }
 
 /**
- * @brief 
+ * @brief Releases ownership of the managed pointer.
  *
- * @tparam T 
- * @tparam Deleter 
- * @return 
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor.
+ * @return The managed pointer. After the call, the internal pointer is set to nullptr.
  */
 template<typename T, typename Deleter>
 T	*UniquePtrBase<T, Deleter>::release() throw()
@@ -143,11 +153,11 @@ T	*UniquePtrBase<T, Deleter>::release() throw()
 }
 
 /**
- * @brief 
+ * @brief Replaces the managed pointer with a new one, deleting the old one if necessary.
  *
- * @tparam T 
- * @tparam Deleter 
- * @param ptr 
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor.
+ * @param ptr The new pointer to manage.
  */
 template<typename T, typename Deleter>
 void	UniquePtrBase<T, Deleter>::reset(T *ptr) throw()
@@ -161,11 +171,11 @@ void	UniquePtrBase<T, Deleter>::reset(T *ptr) throw()
 }
 
 /**
- * @brief 
- *
- * @tparam T 
- * @tparam Deleter 
- * @param other 
+ * @brief Swaps the managed pointer and deleter with another UniquePtrBase.
+ * 
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor.
+ * @param other The other UniquePtrBase to swap with.
  */
 template<typename T, typename Deleter>
 void	UniquePtrBase<T, Deleter>::swap(UniquePtrBase &other) throw()
@@ -175,11 +185,11 @@ void	UniquePtrBase<T, Deleter>::swap(UniquePtrBase &other) throw()
 }
 
 /**
- * @brief 
+ * @brief Gets the managed pointer.
  *
- * @tparam T 
- * @tparam Deleter 
- * @return 
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor.
+ * @return The managed pointer.
  */
 template<typename T, typename Deleter>
 T	*UniquePtrBase<T, Deleter>::get() const throw()
@@ -188,11 +198,11 @@ T	*UniquePtrBase<T, Deleter>::get() const throw()
 }
 
 /**
- * @brief 
+ * @brief Gets a reference to the deleter.
  *
- * @tparam T 
- * @tparam Deleter 
- * @return 
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor.
+ * @return Reference to the deleter.
  */
 template<typename T, typename Deleter>
 Deleter	&UniquePtrBase<T, Deleter>::getDeleter() throw()
@@ -201,11 +211,11 @@ Deleter	&UniquePtrBase<T, Deleter>::getDeleter() throw()
 }
 
 /**
- * @brief 
+ * @brief Gets a const reference to the deleter.
  *
- * @tparam T 
- * @tparam Deleter 
- * @return 
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor.
+ * @return Const reference to the deleter.
  */
 template<typename T, typename Deleter>
 const Deleter	&UniquePtrBase<T, Deleter>::getDeleter() const throw()
@@ -214,11 +224,11 @@ const Deleter	&UniquePtrBase<T, Deleter>::getDeleter() const throw()
 }
 
 /**
- * @brief 
+ * @brief Member access operator for UniquePtr.
  *
- * @tparam T 
- * @tparam Deleter 
- * @return 
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor.
+ * @return Pointer to the managed object.
  */
 template<typename T, typename Deleter>
 T	*UniquePtr<T, Deleter>::operator->() const throw()
@@ -227,10 +237,11 @@ T	*UniquePtr<T, Deleter>::operator->() const throw()
 }
 
 /**
- * @brief 
+ * @brief Dereference operator for UniquePtr.
  *
- * @tparam T 
- * @return 
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor.
+ * @return Reference to the managed object.
  */
 template<typename T, typename Deleter>
 T	&UniquePtr<T, Deleter>::operator*() const throw()
@@ -239,12 +250,12 @@ T	&UniquePtr<T, Deleter>::operator*() const throw()
 }
 
 /**
- * @brief 
+ * @brief Array subscript operator for UniquePtr<T[], Deleter>.
  *
- * @tparam T 
- * @tparam Deleter 
- * @param i 
- * @return 
+ * @tparam T Type of the managed array elements.
+ * @tparam Deleter Type of the deleter functor.
+ * @param i Index of the element.
+ * @return Reference to the element at index i.
  */
 template<typename T, typename Deleter>
 T	&UniquePtr<T[], Deleter>::operator[](std::size_t i) const
