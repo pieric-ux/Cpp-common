@@ -46,9 +46,7 @@ void	swap(T (&a)[N], T (&b)[N])
 {
 	for (std::size_t i = 0; i < N; ++i)
 	{
-		T tmp = a[i];
-		a[i] = b[i];
-		b[i] = a[i];
+		swap(a[i], b[i]);
 	}
 }
 
