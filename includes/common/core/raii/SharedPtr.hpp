@@ -31,6 +31,22 @@ namespace raii
 {
 
 /**
+ * @def MAKE_SHARED(TYPE, ...)
+ * @brief Helper macro to create a SharedPtr for a single object.
+ *
+ * Constructs a SharedPtr of the specified TYPE, forwarding any constructor arguments.
+ */
+#define MAKE_SHARED(TYPE, ...) SharedPtr<TYPE>(new TYPE(__VA_ARGS__))
+
+/**
+ * @def MAKE_SHARED_ARRAY(TYPE, SIZE)
+ * @brief Helper macro to create a SharedPtr for an array.
+ *
+ * Constructs a SharedPtr for an array of TYPE with the given SIZE.
+ */
+#define MAKE_SHARED_ARRAY(TYPE, SIZE) SharedPtr<TYPE[]>(new TYPE[SIZE])
+
+/**
  * @class SharedPtrBase
  * @brief Base class for reference-counted shared ownership smart pointers.
  *
