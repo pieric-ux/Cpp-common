@@ -30,6 +30,22 @@ namespace raii
 {
 
 /**
+ * @def MAKE_UNIQUE(TYPE, ...)
+ * @brief Helper macro to create a UniquePtr for a single object.
+ *
+ * Constructs a UniquePtr of the specified TYPE, forwarding any constructor arguments.
+ */
+#define MAKE_UNIQUE(TYPE, ...)			UniquePtr<TYPE>(new TYPE(__VA_ARGS__))
+
+/**
+ * @def MAKE_UNIQUE_ARRAY(TYPE, SIZE)
+ * @brief Helper macro to create a UniquePtr for an array.
+ *
+ * Constructs a UniquePtr for an array of TYPE with the given SIZE.
+ */
+#define MAKE_UNIQUE_ARRAY(TYPE, SIZE)	UniquePtr<TYPE[]>(new TYPE[SIZE])
+
+/**
  * @class UniquePtrBase
  * @brief Base class for unique ownership smart pointers.
  *
@@ -61,7 +77,6 @@ class UniquePtrBase
 		UniquePtrBase(const UniquePtrBase &rhs); 
 		UniquePtrBase &operator=(const UniquePtrBase &rhs);
 };
-
 
 /**
  * @class UniquePtr
