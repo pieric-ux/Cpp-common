@@ -534,6 +534,102 @@ bool operator!=(const T *null_ptr, const SharedPtr<T, Deleter> &rhs) throw()
 	return (!(rhs.get() == null_ptr));
 }
 
+/**
+ * @brief 
+ *
+ * @tparam T 
+ * @tparam U 
+ * @param r 
+ * @return 
+ */
+template<typename T, typename U>
+SharedPtr<T> staticPointerCast(const SharedPtr<U> &rhs) throw()
+{
+    T *ptr = static_cast<T *>(rhs.get());
+	raii::SharedPtr<T> result;
+	if (ptr)
+	{
+		result._ptr = ptr;
+		result._count = rhs._count;
+		result._deleter = rhs._deleter;
+		if (result._count)
+			++(*result._count);
+	}
+	return (result);
+}
+
+/**
+ * @brief 
+ *
+ * @tparam T 
+ * @tparam U 
+ * @param rhs 
+ * @return 
+ */
+template<typename T, typename U>
+SharedPtr<T> dynamicPointerCast(const SharedPtr<U> &rhs) throw()
+{
+	T *ptr = dynamic_cast<T *>(rhs.get());
+	raii::SharedPtr<T> result;
+	if (ptr)
+	{
+		result._ptr = ptr;
+		result._count = rhs._count;
+		result._deleter = rhs._deleter;
+		if (result._count)
+			++(*result._count);
+	}
+	return (result);
+}
+
+/**
+ * @brief 
+ *
+ * @tparam T 
+ * @tparam U 
+ * @param rhs 
+ * @return 
+ */
+template<typename T, typename U>
+SharedPtr<T> constPointerCast(const SharedPtr<U> &rhs) throw()
+{
+	T *ptr = const_cast<T *>(rhs.get());
+	raii::SharedPtr<T> result;
+	if (ptr)
+	{
+		result._ptr = ptr;
+		result._count = rhs._count;
+		result._deleter = rhs._deleter;
+		if (result._count)
+			++(*result._count);
+	}
+	return (result);
+}
+
+/**
+ * @brief 
+ *
+ * @tparam T 
+ * @tparam U 
+ * @param rhs 
+ * @return 
+ */
+template<typename T, typename U>
+SharedPtr<T> reinterpretPointerCast(const SharedPtr<U> &rhs) throw()
+{
+	T *ptr = reinterpret_cast<T *>(rhs.get());
+	raii::SharedPtr<T> result;
+	if (ptr)
+	{
+		result._ptr = ptr;
+		result._count = rhs._count;
+		result._deleter = rhs._deleter;
+		if (result._count)
+			++(*result._count);
+	}
+	return (result);
+}
+
 } // !raii
 } // !core
 } // !common
