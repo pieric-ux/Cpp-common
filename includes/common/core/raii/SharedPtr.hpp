@@ -69,6 +69,8 @@ class SharedPtrBase
 		std::size_t		useCount() const throw();
 		bool			unique() const throw();
 
+		operator bool() const throw();
+
 	protected:
 		T				*_ptr;
 		Deleter			_deleter;
@@ -313,6 +315,21 @@ bool	SharedPtrBase<T, Deleter>::unique() const throw()
 }
 
 /**
+ * @brief Conversion operator to bool for SharedPtrBase.
+ *
+ * Allows checking if the SharedPtrBase currently manages a non-null pointer.
+ *
+ * @tparam T Type of the managed object.
+ * @tparam Deleter Type of the deleter functor.
+ * @return true if the managed pointer is not null, false otherwise.
+ */
+template<typename T, typename Deleter>
+SharedPtrBase<T, Deleter>::operator bool() const throw()
+{
+	return (this->_ptr != 0);
+}
+
+/**
  * @brief Member access operator for SharedPtr.
  * 
  * @tparam T Type of the managed object.
@@ -535,12 +552,12 @@ bool operator!=(const T *null_ptr, const SharedPtr<T, Deleter> &rhs) throw()
 }
 
 /**
- * @brief 
+ * @brief Casts a SharedPtr<U> to SharedPtr<T> using static_cast.
  *
- * @tparam T 
- * @tparam U 
- * @param r 
- * @return 
+ * @tparam T Target type for the cast.
+ * @tparam U Source type of the SharedPtr.
+ * @param rhs SharedPtr<U> to cast.
+ * @return SharedPtr<T> pointing to the same object if cast is valid, otherwise an empty SharedPtr<T>.
  */
 template<typename T, typename U>
 SharedPtr<T> staticPointerCast(const SharedPtr<U> &rhs) throw()
@@ -559,12 +576,12 @@ SharedPtr<T> staticPointerCast(const SharedPtr<U> &rhs) throw()
 }
 
 /**
- * @brief 
+ * @brief Casts a SharedPtr<U> to SharedPtr<T> using dynamic_cast.
  *
- * @tparam T 
- * @tparam U 
- * @param rhs 
- * @return 
+ * @tparam T Target type for the cast.
+ * @tparam U Source type of the SharedPtr.
+ * @param rhs SharedPtr<U> to cast.
+ * @return SharedPtr<T> pointing to the same object if cast is valid, otherwise an empty SharedPtr<T>.
  */
 template<typename T, typename U>
 SharedPtr<T> dynamicPointerCast(const SharedPtr<U> &rhs) throw()
@@ -583,12 +600,12 @@ SharedPtr<T> dynamicPointerCast(const SharedPtr<U> &rhs) throw()
 }
 
 /**
- * @brief 
+ * @brief Casts a SharedPtr<U> to SharedPtr<T> using const_cast.
  *
- * @tparam T 
- * @tparam U 
- * @param rhs 
- * @return 
+ * @tparam T Target type for the cast.
+ * @tparam U Source type of the SharedPtr.
+ * @param rhs SharedPtr<U> to cast.
+ * @return SharedPtr<T> pointing to the same object if cast is valid, otherwise an empty SharedPtr<T>.
  */
 template<typename T, typename U>
 SharedPtr<T> constPointerCast(const SharedPtr<U> &rhs) throw()
@@ -607,12 +624,12 @@ SharedPtr<T> constPointerCast(const SharedPtr<U> &rhs) throw()
 }
 
 /**
- * @brief 
+ * @brief Casts a SharedPtr<U> to SharedPtr<T> using reinterpret_cast.
  *
- * @tparam T 
- * @tparam U 
- * @param rhs 
- * @return 
+ * @tparam T Target type for the cast.
+ * @tparam U Source type of the SharedPtr.
+ * @param rhs SharedPtr<U> to cast.
+ * @return SharedPtr<T> pointing to the same object if cast is valid, otherwise an empty SharedPtr<T>.
  */
 template<typename T, typename U>
 SharedPtr<T> reinterpretPointerCast(const SharedPtr<U> &rhs) throw()
