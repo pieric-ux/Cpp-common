@@ -278,6 +278,188 @@ T	&UniquePtr<T[], Deleter>::operator[](std::size_t i) const
 	return (this->_ptr[i]);
 }
 
+/**
+ * @brief Equality comparison operator for UniquePtr.
+ *
+ * Compares the managed pointers of two UniquePtr instances for equality.
+ *
+ * @tparam T Type of the first UniquePtr.
+ * @tparam TDeleter Deleter type of the first UniquePtr.
+ * @tparam U Type of the second UniquePtr.
+ * @tparam UDeleter Deleter type of the second UniquePtr.
+ * @param lhs Left-hand side UniquePtr.
+ * @param rhs Right-hand side UniquePtr.
+ * @return true if both UniquePtr instances manage the same pointer, false otherwise.
+ */
+template<typename T, typename TDeleter, typename U, typename UDeleter> 
+bool	operator==(const UniquePtr<T, TDeleter> &lhs, const UniquePtr<U, UDeleter> &rhs)
+{
+	return (lhs.get() == rhs.get());
+}
+
+/**
+ * @brief Inequality comparison operator for UniquePtr.
+ *
+ * Compares the managed pointers of two UniquePtr instances for inequality.
+ *
+ * @tparam T Type of the first UniquePtr.
+ * @tparam TDeleter Deleter type of the first UniquePtr.
+ * @tparam U Type of the second UniquePtr.
+ * @tparam UDeleter Deleter type of the second UniquePtr.
+ * @param lhs Left-hand side UniquePtr.
+ * @param rhs Right-hand side UniquePtr.
+ * @return true if both UniquePtr instances manage different pointers, false otherwise.
+ */
+template<typename T, typename TDeleter, typename U, typename UDeleter>
+bool	operator!=(const UniquePtr<T, TDeleter> &lhs, const UniquePtr<U, UDeleter> &rhs)
+{
+	return (!(lhs == rhs));
+}
+
+/**
+ * @brief Less-than comparison operator for UniquePtr.
+ *
+ * Compares the managed pointers of two UniquePtr instances for ordering.
+ *
+ * @tparam T Type of the first UniquePtr.
+ * @tparam TDeleter Deleter type of the first UniquePtr.
+ * @tparam U Type of the second UniquePtr.
+ * @tparam UDeleter Deleter type of the second UniquePtr.
+ * @param lhs Left-hand side UniquePtr.
+ * @param rhs Right-hand side UniquePtr.
+ * @return true if lhs's managed pointer is less than rhs's managed pointer.
+ */
+template<typename T, typename TDeleter, typename U, typename UDeleter>
+bool	operator<(const UniquePtr<T, TDeleter> &lhs, const UniquePtr<U, UDeleter> &rhs)
+{
+	return (lhs.get() < rhs.get());
+}
+
+/**
+ * @brief Greater-than comparison operator for UniquePtr.
+ *
+ * Compares the managed pointers of two UniquePtr instances for ordering.
+ *
+ * @tparam T Type of the first UniquePtr.
+ * @tparam TDeleter Deleter type of the first UniquePtr.
+ * @tparam U Type of the second UniquePtr.
+ * @tparam UDeleter Deleter type of the second UniquePtr.
+ * @param lhs Left-hand side UniquePtr.
+ * @param rhs Right-hand side UniquePtr.
+ * @return true if lhs's managed pointer is greater than rhs's managed pointer.
+ */
+template<typename T, typename TDeleter, typename U, typename UDeleter>
+bool	operator>(const UniquePtr<T, TDeleter> &lhs, const UniquePtr<U, UDeleter> &rhs)
+{
+	return (rhs < lhs);
+}
+
+/**
+ * @brief Less-than-or-equal comparison operator for UniquePtr.
+ *
+ * Compares the managed pointers of two UniquePtr instances for ordering.
+ *
+ * @tparam T Type of the first UniquePtr.
+ * @tparam TDeleter Deleter type of the first UniquePtr.
+ * @tparam U Type of the second UniquePtr.
+ * @tparam UDeleter Deleter type of the second UniquePtr.
+ * @param lhs Left-hand side UniquePtr.
+ * @param rhs Right-hand side UniquePtr.
+ * @return true if lhs's managed pointer is less than or equal to rhs's managed pointer.
+ */
+template<typename T, typename TDeleter, typename U, typename UDeleter>
+bool	operator<=(const UniquePtr<T, TDeleter> &lhs, const UniquePtr<U, UDeleter> &rhs)
+{
+	return (!(lhs > rhs));
+}
+
+/**
+ * @brief Greater-than-or-equal comparison operator for UniquePtr.
+ *
+ * Compares the managed pointers of two UniquePtr instances for ordering.
+ *
+ * @tparam T Type of the first UniquePtr.
+ * @tparam TDeleter Deleter type of the first UniquePtr.
+ * @tparam U Type of the second UniquePtr.
+ * @tparam UDeleter Deleter type of the second UniquePtr.
+ * @param lhs Left-hand side UniquePtr.
+ * @param rhs Right-hand side UniquePtr.
+ * @return true if lhs's managed pointer is greater than or equal to rhs's managed pointer.
+ */
+template<typename T, typename TDeleter, typename U, typename UDeleter>
+bool	operator>=(const UniquePtr<T, TDeleter> &lhs, const UniquePtr<U, UDeleter> &rhs)
+{
+	return (!(lhs < rhs));
+}
+
+/**
+ * @brief Equality comparison operator for UniquePtr and raw pointer.
+ *
+ * Compares the managed pointer of a UniquePtr with a raw pointer for equality.
+ *
+ * @tparam T Type of the UniquePtr.
+ * @tparam Deleter Deleter type of the UniquePtr.
+ * @param lhs UniquePtr instance.
+ * @param null_ptr Raw pointer to compare.
+ * @return true if the UniquePtr manages the same pointer as null_ptr.
+ */
+template<typename T, typename Deleter>
+bool operator==(const UniquePtr<T, Deleter> &lhs, const T *null_ptr) throw()
+{
+	return (lhs.get() == null_ptr);
+}
+
+/**
+ * @brief Equality comparison operator for raw pointer and UniquePtr.
+ *
+ * Compares the managed pointer of a UniquePtr with a raw pointer for equality.
+ *
+ * @tparam T Type of the UniquePtr.
+ * @tparam Deleter Deleter type of the UniquePtr.
+ * @param null_ptr Raw pointer to compare.
+ * @param rhs UniquePtr instance.
+ * @return true if the UniquePtr manages the same pointer as null_ptr.
+ */
+template<typename T, typename Deleter>
+bool operator==(const T *null_ptr, const UniquePtr<T, Deleter> &rhs) throw()
+{
+	return (rhs.get() == null_ptr);
+}
+
+/**
+ * @brief Inequality comparison operator for UniquePtr and raw pointer.
+ *
+ * Compares the managed pointer of a UniquePtr with a raw pointer for inequality.
+ *
+ * @tparam T Type of the UniquePtr.
+ * @tparam Deleter Deleter type of the UniquePtr.
+ * @param lhs UniquePtr instance.
+ * @param null_ptr Raw pointer to compare.
+ * @return true if the UniquePtr manages a different pointer than null_ptr.
+ */
+template<typename T, typename Deleter>
+bool operator!=(const UniquePtr<T, Deleter> &lhs, const T *null_ptr) throw()
+{
+	return (!(lhs == null_ptr));
+}
+
+/**
+ * @brief Inequality comparison operator for raw pointer and UniquePtr.
+ *
+ * Compares the managed pointer of a UniquePtr with a raw pointer for inequality.
+ *
+ * @tparam T Type of the UniquePtr.
+ * @tparam Deleter Deleter type of the UniquePtr.
+ * @param null_ptr Raw pointer to compare.
+ * @param rhs UniquePtr instance.
+ * @return true if the UniquePtr manages a different pointer than null_ptr.
+ */
+template<typename T, typename Deleter>
+bool operator!=(const T *null_ptr, const UniquePtr<T, Deleter> &rhs) throw()
+{
+	return (!(rhs.get() == null_ptr));
+}
+
 } // !raii
 } // !core
 } // !common

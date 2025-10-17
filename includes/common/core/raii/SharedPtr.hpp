@@ -352,6 +352,188 @@ T	&SharedPtr<T[], Deleter>::operator[](std::size_t i) const
 	return (this->_ptr[i]);
 }
 
+/**
+ * @brief Equality comparison operator for SharedPtr.
+ *
+ * Compares the managed pointers of two SharedPtr instances for equality.
+ *
+ * @tparam T Type of the first SharedPtr.
+ * @tparam TDeleter Deleter type of the first SharedPtr.
+ * @tparam U Type of the second SharedPtr.
+ * @tparam UDeleter Deleter type of the second SharedPtr.
+ * @param lhs Left-hand side SharedPtr.
+ * @param rhs Right-hand side SharedPtr.
+ * @return true if both SharedPtr instances manage the same pointer, false otherwise.
+ */
+template<typename T, typename TDeleter, typename U, typename UDeleter>
+bool	operator==(const SharedPtr<T, TDeleter> &lhs, const SharedPtr<U, UDeleter> &rhs) throw()
+{
+	return (lhs.get() == rhs.get());
+}
+
+/**
+ * @brief Inequality comparison operator for SharedPtr.
+ *
+ * Compares the managed pointers of two SharedPtr instances for inequality.
+ *
+ * @tparam T Type of the first SharedPtr.
+ * @tparam TDeleter Deleter type of the first SharedPtr.
+ * @tparam U Type of the second SharedPtr.
+ * @tparam UDeleter Deleter type of the second SharedPtr.
+ * @param lhs Left-hand side SharedPtr.
+ * @param rhs Right-hand side SharedPtr.
+ * @return true if both SharedPtr instances manage different pointers, false otherwise.
+ */
+template<typename T, typename TDeleter, typename U, typename UDeleter>
+bool	operator!=(const SharedPtr<T, TDeleter> &lhs, const SharedPtr<U, UDeleter> &rhs) throw()
+{
+	return (!(lhs == rhs));
+}
+
+/**
+ * @brief Less-than comparison operator for SharedPtr.
+ *
+ * Compares the managed pointers of two SharedPtr instances for ordering.
+ *
+ * @tparam T Type of the first SharedPtr.
+ * @tparam TDeleter Deleter type of the first SharedPtr.
+ * @tparam U Type of the second SharedPtr.
+ * @tparam UDeleter Deleter type of the second SharedPtr.
+ * @param lhs Left-hand side SharedPtr.
+ * @param rhs Right-hand side SharedPtr.
+ * @return true if lhs's managed pointer is less than rhs's managed pointer.
+ */
+template<typename T, typename TDeleter, typename U, typename UDeleter>
+bool	operator<(const SharedPtr<T, TDeleter> &lhs, const SharedPtr<U, UDeleter> &rhs)
+{
+	return (lhs.get() < rhs.get());
+}
+
+/**
+ * @brief Greater-than comparison operator for SharedPtr.
+ *
+ * Compares the managed pointers of two SharedPtr instances for ordering.
+ *
+ * @tparam T Type of the first SharedPtr.
+ * @tparam TDeleter Deleter type of the first SharedPtr.
+ * @tparam U Type of the second SharedPtr.
+ * @tparam UDeleter Deleter type of the second SharedPtr.
+ * @param lhs Left-hand side SharedPtr.
+ * @param rhs Right-hand side SharedPtr.
+ * @return true if lhs's managed pointer is greater than rhs's managed pointer.
+ */
+template<typename T, typename TDeleter, typename U, typename UDeleter>
+bool	operator>(const SharedPtr<T, TDeleter> &lhs, const SharedPtr<U, UDeleter> &rhs)
+{
+	return (rhs < lhs);
+}
+
+/**
+ * @brief Less-than-or-equal comparison operator for SharedPtr.
+ *
+ * Compares the managed pointers of two SharedPtr instances for ordering.
+ *
+ * @tparam T Type of the first SharedPtr.
+ * @tparam TDeleter Deleter type of the first SharedPtr.
+ * @tparam U Type of the second SharedPtr.
+ * @tparam UDeleter Deleter type of the second SharedPtr.
+ * @param lhs Left-hand side SharedPtr.
+ * @param rhs Right-hand side SharedPtr.
+ * @return true if lhs's managed pointer is less than or equal to rhs's managed pointer.
+ */
+template<typename T, typename TDeleter, typename U, typename UDeleter>
+bool	operator<=(const SharedPtr<T, TDeleter> &lhs, const SharedPtr<U, UDeleter> &rhs)
+{
+	return (!(lhs > rhs));
+}
+
+/**
+ * @brief Greater-than-or-equal comparison operator for SharedPtr.
+ *
+ * Compares the managed pointers of two SharedPtr instances for ordering.
+ *
+ * @tparam T Type of the first SharedPtr.
+ * @tparam TDeleter Deleter type of the first SharedPtr.
+ * @tparam U Type of the second SharedPtr.
+ * @tparam UDeleter Deleter type of the second SharedPtr.
+ * @param lhs Left-hand side SharedPtr.
+ * @param rhs Right-hand side SharedPtr.
+ * @return true if lhs's managed pointer is greater than or equal to rhs's managed pointer.
+ */
+template<typename T, typename TDeleter, typename U, typename UDeleter>
+bool	operator>=(const SharedPtr<T, TDeleter> &lhs, const SharedPtr<U, UDeleter> &rhs)
+{
+	return (!(lhs < rhs));
+}
+
+/**
+ * @brief Equality comparison operator for SharedPtr and raw pointer.
+ *
+ * Compares the managed pointer of a SharedPtr with a raw pointer for equality.
+ *
+ * @tparam T Type of the SharedPtr.
+ * @tparam Deleter Deleter type of the SharedPtr.
+ * @param lhs SharedPtr instance.
+ * @param null_ptr Raw pointer to compare.
+ * @return true if the SharedPtr manages the same pointer as null_ptr.
+ */
+template<typename T, typename Deleter>
+bool operator==(const SharedPtr<T, Deleter> &lhs, const T *null_ptr) throw()
+{
+	return (lhs.get() == null_ptr);
+}
+
+/**
+ * @brief Equality comparison operator for raw pointer and SharedPtr.
+ *
+ * Compares the managed pointer of a SharedPtr with a raw pointer for equality.
+ *
+ * @tparam T Type of the SharedPtr.
+ * @tparam Deleter Deleter type of the SharedPtr.
+ * @param null_ptr Raw pointer to compare.
+ * @param rhs SharedPtr instance.
+ * @return true if the SharedPtr manages the same pointer as null_ptr.
+ */
+template<typename T, typename Deleter>
+bool operator==(const T *null_ptr, const SharedPtr<T, Deleter> &rhs) throw()
+{
+	return (rhs.get() == null_ptr);
+}
+
+/**
+ * @brief Inequality comparison operator for SharedPtr and raw pointer.
+ *
+ * Compares the managed pointer of a SharedPtr with a raw pointer for inequality.
+ *
+ * @tparam T Type of the SharedPtr.
+ * @tparam Deleter Deleter type of the SharedPtr.
+ * @param lhs SharedPtr instance.
+ * @param null_ptr Raw pointer to compare.
+ * @return true if the SharedPtr manages a different pointer than null_ptr.
+ */
+template<typename T, typename Deleter>
+bool operator!=(const SharedPtr<T, Deleter> &lhs, const T *null_ptr) throw()
+{
+	return (!(lhs == null_ptr));
+}
+
+/**
+ * @brief Inequality comparison operator for raw pointer and SharedPtr.
+ *
+ * Compares the managed pointer of a SharedPtr with a raw pointer for inequality.
+ *
+ * @tparam T Type of the SharedPtr.
+ * @tparam Deleter Deleter type of the SharedPtr.
+ * @param null_ptr Raw pointer to compare.
+ * @param rhs SharedPtr instance.
+ * @return true if the SharedPtr manages a different pointer than null_ptr.
+ */
+template<typename T, typename Deleter>
+bool operator!=(const T *null_ptr, const SharedPtr<T, Deleter> &rhs) throw()
+{
+	return (!(rhs.get() == null_ptr));
+}
+
 } // !raii
 } // !core
 } // !common
