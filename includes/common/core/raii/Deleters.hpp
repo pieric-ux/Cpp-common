@@ -19,6 +19,18 @@
  */
 
 /**
+ * @struct IDeleter
+ * @brief 
+ *
+ */
+struct IDeleter
+{
+	virtual ~IDeleter() {}
+
+	virtual void destroy(void *ptr) = 0;
+};
+
+/**
 * @struct DefaultDelete
 * @brief Default deleter for single objects.
 *
@@ -27,23 +39,9 @@
 * @tparam T Type of the object to delete.
 */
 template<typename T>
-struct DefaultDelete
+struct DefaultDelete : public IDeleter
 {
-	void	operator()(T *ptr) const throw() { delete ptr; }
-};
-
-/**
- * @struct DefaultDelete<T[]>
- * @brief Default deleter specialization for arrays.
- *
- * Provides a function call operator to delete a pointer to an array.
- *
- * @tparam T Type of the array elements to delete.
- */
-template<typename T>
-struct DefaultDelete<T[]>
-{
-	void	operator()(T *ptr) const throw() { delete[] ptr; }
+	void	destroy(void *ptr) const throw() { delete static_cast<T *>(ptr); }
 };
 
 #endif // !DELETERS_HPP

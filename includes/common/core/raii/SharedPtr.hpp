@@ -36,7 +36,7 @@ namespace raii
  *
  * Constructs a SharedPtr of the specified TYPE, forwarding any constructor arguments.
  */
-#define MAKE_SHARED(TYPE, ...) SharedPtr<TYPE>(new TYPE(__VA_ARGS__))
+#define MAKE_SHARED(TYPE, ...) common::core::raii::SharedPtr<TYPE>(new TYPE(__VA_ARGS__))
 
 /**
  * @def MAKE_SHARED_ARRAY(TYPE, SIZE)
@@ -44,7 +44,9 @@ namespace raii
  *
  * Constructs a SharedPtr for an array of TYPE with the given SIZE.
  */
-#define MAKE_SHARED_ARRAY(TYPE, SIZE) SharedPtr<TYPE[]>(new TYPE[SIZE])
+#define MAKE_SHARED_ARRAY(TYPE, SIZE) common::core::raii::SharedPtr<TYPE[]>(new TYPE[SIZE])
+
+template<typename T> class SharedPtr;
 
 /**
  * @class SharedPtrBase
@@ -53,9 +55,8 @@ namespace raii
  * Manages a pointer, a deleter, and a reference count for shared ownership.
  *
  * @tparam T Type of the managed object.
- * @tparam Deleter Type of the deleter functor.
  */
-template<typename T, typename Deleter>
+template<typename T>
 class SharedPtrBase
 {
 	public:
@@ -63,8 +64,6 @@ class SharedPtrBase
 		void			swap(SharedPtrBase &other) throw();
 
 		T				*get() const throw();
-		Deleter			&getDeleter() throw();
-		const Deleter	&getDeleter() const throw();
 
 		std::size_t		useCount() const throw();
 		bool			unique() const throw();
@@ -73,14 +72,26 @@ class SharedPtrBase
 
 	protected:
 		T				*_ptr;
-		Deleter			_deleter;
+		IDeleter		*_deleter;
 		std::size_t		*_count;
 
-		explicit SharedPtrBase(T *ptr = 0, Deleter deleter = Deleter()) throw();
+		explicit SharedPtrBase(T *ptr = 0, IDeleter *deleter = 0) throw();
 		~SharedPtrBase();
 
 		SharedPtrBase(const SharedPtrBase &rhs) throw();
 		SharedPtrBase &operator=(const SharedPtrBase &rhs) throw();
+
+		template<typename X, typename Y>
+		friend SharedPtr<X> staticPointerCast(const SharedPtr<Y> &rhs) throw();
+
+		template<typename X, typename Y>
+		friend SharedPtr<X> dynamicPointerCast(const SharedPtr<Y> &rhs) throw();
+
+		template<typename X, typename Y>
+		friend SharedPtr<X> constPointerCast(const SharedPtr<Y> &rhs) throw();
+
+		template<typename X, typename Y>
+		friend SharedPtr<X> reinterpretPointerCast(const SharedPtr<Y> &rhs) throw();
 };
 
 /**
@@ -90,15 +101,14 @@ class SharedPtrBase
  * Provides shared ownership semantics for a dynamically allocated object.
  *
  * @tparam T Type of the managed object.
- * @tparam Deleter Type of the deleter functor (default: DefaultDelete<T>).
  */
-template<typename T, typename Deleter = DefaultDelete<T> >
-class SharedPtr : public SharedPtrBase<T, Deleter>
+template<typename T>
+class SharedPtr : public SharedPtrBase<T>
 {
 	public:
-		typedef SharedPtrBase<T, Deleter> Base;
+		typedef SharedPtrBase<T> Base;
 
-		explicit SharedPtr(T *ptr = 0, Deleter deleter = Deleter()) throw() : Base(ptr, deleter) {}
+		explicit SharedPtr(T *ptr = 0) throw() : Base(ptr) {}
 		~SharedPtr() {}
 
 		SharedPtr(const SharedPtr &rhs) throw() : Base(rhs) {}
@@ -119,15 +129,14 @@ class SharedPtr : public SharedPtrBase<T, Deleter>
  * Provides shared ownership semantics for a dynamically allocated array.
  *
  * @tparam T Type of the managed array elements.
- * @tparam Deleter Type of the deleter functor.
  */
-template<typename T, typename Deleter>
-class SharedPtr<T[], Deleter> : SharedPtrBase<T, Deleter>
+template<typename T>
+class SharedPtr<T[]> : SharedPtrBase<T>
 {
 	public:
-		typedef SharedPtrBase<T, Deleter> Base;
+		typedef SharedPtrBase<T> Base;
 
-		explicit SharedPtr(T *ptr = 0, Deleter deleter = Deleter()) throw() : Base(ptr, deleter) {}
+		explicit SharedPtr(T *ptr = 0) throw() : Base(ptr) {}
 		~SharedPtr() {}
 
 		SharedPtr(const SharedPtr &rhs) throw() : Base(rhs) {}
@@ -144,12 +153,11 @@ class SharedPtr<T[], Deleter> : SharedPtrBase<T, Deleter>
  * @brief Constructs a SharedPtrBase with a pointer and deleter.
  *
  * @tparam T Type of the managed object.
- * @tparam Deleter Type of the deleter functor.
  * @param ptr The pointer to manage.
  * @param deleter The deleter to use.
  */
-template<typename T, typename Deleter>
-SharedPtrBase<T, Deleter>::SharedPtrBase(T *ptr, Deleter deleter) throw() : _ptr(ptr), _deleter(deleter), _count(0)
+template<typename T>
+SharedPtrBase<T>::SharedPtrBase(T *ptr, IDeleter *deleter) throw() : _ptr(ptr), _deleter(deleter ? deleter : new DefaultDelete<T>()), _count(0)
 {
 	if (this->_ptr)
 		this->_count = new std::size_t(1);
@@ -159,23 +167,23 @@ SharedPtrBase<T, Deleter>::SharedPtrBase(T *ptr, Deleter deleter) throw() : _ptr
  * @brief Destructor. Decrements reference count and deletes managed pointer if needed.
  *
  * @tparam T Type of the managed object.
- * @tparam Deleter Type of the deleter functor.
  */
-template<typename T, typename Deleter>
-SharedPtrBase<T, Deleter>::~SharedPtrBase()
+template<typename T>
+SharedPtrBase<T>::~SharedPtrBase()
 {
 	reset();
+	if (this->_deleter)
+		delete this->_deleter;
 }
 
 /**
  * @brief Copy constructor. Increments reference count.
  *
  * @tparam T Type of the managed object.
- * @tparam Deleter Type of the deleter functor.
  * @param rhs SharedPtrBase to copy from.
  */
-template<typename T, typename Deleter>
-SharedPtrBase<T, Deleter>::SharedPtrBase(const SharedPtrBase &rhs) throw() : _ptr(rhs._ptr), _deleter(rhs._deleter), _count(rhs._count)
+template<typename T>
+SharedPtrBase<T>::SharedPtrBase(const SharedPtrBase &rhs) throw() : _ptr(rhs._ptr), _deleter(rhs._deleter), _count(rhs._count)
 {
 	if (this->_count)
 		++(this->_count);
@@ -185,12 +193,11 @@ SharedPtrBase<T, Deleter>::SharedPtrBase(const SharedPtrBase &rhs) throw() : _pt
  * @brief Assignment operator. Handles reference count and pointer management.
  *
  * @tparam T Type of the managed object.
- * @tparam Deleter Type of the deleter functor.
  * @param rhs SharedPtrBase to assign from.
  * @return Reference to this instance.
  */
-template<typename T, typename Deleter>
-SharedPtrBase<T, Deleter>	&SharedPtrBase<T, Deleter>::operator=(const SharedPtrBase &rhs) throw()
+template<typename T>
+SharedPtrBase<T>	&SharedPtrBase<T>::operator=(const SharedPtrBase &rhs) throw()
 {
 	if (this != &rhs)
 	{
@@ -208,17 +215,17 @@ SharedPtrBase<T, Deleter>	&SharedPtrBase<T, Deleter>::operator=(const SharedPtrB
  * @brief Replaces the managed pointer with a new one, updating reference count and deleting if necessary.
  *
  * @tparam T Type of the managed object.
- * @tparam Deleter Type of the deleter functor.
  * @param ptr The new pointer to manage.
  */
-template<typename T, typename Deleter>
-void	SharedPtrBase<T, Deleter>::reset(T *ptr) throw()
+template<typename T>
+void	SharedPtrBase<T>::reset(T *ptr) throw()
 {
 	if (this->_ptr == ptr)
 		return ;
 	if (this->_count && --(*this->_count) == 0)
 	{
-		this->_deleter(this->_ptr);
+		if (this->_deleter)
+			this->_deleter->destroy(this->_ptr);
 		delete this->_count;
 	}
 
@@ -238,11 +245,10 @@ void	SharedPtrBase<T, Deleter>::reset(T *ptr) throw()
  * @brief Swaps the managed pointer, deleter, and reference count with another SharedPtrBase.
  *
  * @tparam T Type of the managed object.
- * @tparam Deleter Type of the deleter functor.
  * @param other The other SharedPtrBase to swap with.
  */
-template<typename T, typename Deleter>
-void	SharedPtrBase<T, Deleter>::swap(SharedPtrBase &other) throw()
+template<typename T>
+void	SharedPtrBase<T>::swap(SharedPtrBase &other) throw()
 {
 	utils::swap(this->_ptr, other._ptr);
 	utils::swap(this->_deleter, other._deleter);
@@ -253,50 +259,22 @@ void	SharedPtrBase<T, Deleter>::swap(SharedPtrBase &other) throw()
  * @brief Gets the managed pointer.
  *
  * @tparam T Type of the managed object.
- * @tparam Deleter Type of the deleter functor.
  * @return The managed pointer.
  */
-template<typename T, typename Deleter>
-T	*SharedPtrBase<T, Deleter>::get() const throw()
+template<typename T>
+T	*SharedPtrBase<T>::get() const throw()
 {
 	return (this->_ptr);
-}
-
-/**
- * @brief Gets a reference to the deleter.
- *
- * @tparam T Type of the managed object.
- * @tparam Deleter Type of the deleter functor.
- * @return Reference to the deleter.
- */
-template<typename T, typename Deleter>
-Deleter	&SharedPtrBase<T, Deleter>::getDeleter() throw()
-{
-	return (this->_deleter);
-}
-
-/**
- * @brief Gets a const reference to the deleter.
- *
- * @tparam T Type of the managed object.
- * @tparam Deleter Type of the deleter functor.
- * @return Const reference to the deleter.
- */
-template<typename T, typename Deleter>
-const Deleter	&SharedPtrBase<T, Deleter>::getDeleter() const throw()
-{
-	return (this->_deleter);
 }
 
 /**
  * @brief Gets the number of SharedPtr instances sharing ownership.
  *
  * @tparam T Type of the managed object.
- * @tparam Deleter Type of the deleter functor.
  * @return Reference count.
  */
-template<typename T, typename Deleter>
-std::size_t		SharedPtrBase<T, Deleter>::useCount() const throw()
+template<typename T>
+std::size_t		SharedPtrBase<T>::useCount() const throw()
 {
 	return (this->_count ? *this->_count : 0);
 }
@@ -305,11 +283,10 @@ std::size_t		SharedPtrBase<T, Deleter>::useCount() const throw()
  * @brief Checks if this is the only SharedPtr owning the managed pointer.
  *
  * @tparam T Type of the managed object.
- * @tparam Deleter Type of the deleter functor.
  * @return True if unique, false otherwise.
  */
-template<typename T, typename Deleter>
-bool	SharedPtrBase<T, Deleter>::unique() const throw()
+template<typename T>
+bool	SharedPtrBase<T>::unique() const throw()
 {
 	return (this->useCount() == 1);
 }
@@ -320,11 +297,10 @@ bool	SharedPtrBase<T, Deleter>::unique() const throw()
  * Allows checking if the SharedPtrBase currently manages a non-null pointer.
  *
  * @tparam T Type of the managed object.
- * @tparam Deleter Type of the deleter functor.
  * @return true if the managed pointer is not null, false otherwise.
  */
-template<typename T, typename Deleter>
-SharedPtrBase<T, Deleter>::operator bool() const throw()
+template<typename T>
+SharedPtrBase<T>::operator bool() const throw()
 {
 	return (this->_ptr != 0);
 }
@@ -333,11 +309,10 @@ SharedPtrBase<T, Deleter>::operator bool() const throw()
  * @brief Member access operator for SharedPtr.
  * 
  * @tparam T Type of the managed object.
- * @tparam Deleter Type of the deleter functor.
  * @return Pointer to the managed object.
  */
-template<typename T, typename Deleter>
-T	*SharedPtr<T, Deleter>::operator->() const throw()
+template<typename T>
+T	*SharedPtr<T>::operator->() const throw()
 {
 	return (this->_ptr);
 }
@@ -346,11 +321,10 @@ T	*SharedPtr<T, Deleter>::operator->() const throw()
  * @brief Dereference operator for SharedPtr.
  *
  * @tparam T Type of the managed object.
- * @tparam Deleter Type of the deleter functor.
  * @return Reference to the managed object.
  */
-template<typename T, typename Deleter>
-T	&SharedPtr<T, Deleter>::operator*() const throw()
+template<typename T>
+T	&SharedPtr<T>::operator*() const throw()
 {
 	return (*this->_ptr);
 }
@@ -359,12 +333,11 @@ T	&SharedPtr<T, Deleter>::operator*() const throw()
  * @brief Array subscript operator for SharedPtr<T[], Deleter>.
  *
  * @tparam T Type of the managed array elements.
- * @tparam Deleter Type of the deleter functor.
  * @param i Index of the element.
  * @return Reference to the element at index i.
  */
-template<typename T, typename Deleter>
-T	&SharedPtr<T[], Deleter>::operator[](std::size_t i) const
+template<typename T>
+T	&SharedPtr<T[]>::operator[](std::size_t i) const
 {
 	return (this->_ptr[i]);
 }
@@ -375,15 +348,13 @@ T	&SharedPtr<T[], Deleter>::operator[](std::size_t i) const
  * Compares the managed pointers of two SharedPtr instances for equality.
  *
  * @tparam T Type of the first SharedPtr.
- * @tparam TDeleter Deleter type of the first SharedPtr.
  * @tparam U Type of the second SharedPtr.
- * @tparam UDeleter Deleter type of the second SharedPtr.
  * @param lhs Left-hand side SharedPtr.
  * @param rhs Right-hand side SharedPtr.
  * @return true if both SharedPtr instances manage the same pointer, false otherwise.
  */
-template<typename T, typename TDeleter, typename U, typename UDeleter>
-bool	operator==(const SharedPtr<T, TDeleter> &lhs, const SharedPtr<U, UDeleter> &rhs) throw()
+template<typename T, typename U>
+bool	operator==(const SharedPtr<T> &lhs, const SharedPtr<U> &rhs) throw()
 {
 	return (lhs.get() == rhs.get());
 }
@@ -394,15 +365,13 @@ bool	operator==(const SharedPtr<T, TDeleter> &lhs, const SharedPtr<U, UDeleter> 
  * Compares the managed pointers of two SharedPtr instances for inequality.
  *
  * @tparam T Type of the first SharedPtr.
- * @tparam TDeleter Deleter type of the first SharedPtr.
  * @tparam U Type of the second SharedPtr.
- * @tparam UDeleter Deleter type of the second SharedPtr.
  * @param lhs Left-hand side SharedPtr.
  * @param rhs Right-hand side SharedPtr.
  * @return true if both SharedPtr instances manage different pointers, false otherwise.
  */
-template<typename T, typename TDeleter, typename U, typename UDeleter>
-bool	operator!=(const SharedPtr<T, TDeleter> &lhs, const SharedPtr<U, UDeleter> &rhs) throw()
+template<typename T, typename U>
+bool	operator!=(const SharedPtr<T> &lhs, const SharedPtr<U> &rhs) throw()
 {
 	return (!(lhs == rhs));
 }
@@ -413,15 +382,13 @@ bool	operator!=(const SharedPtr<T, TDeleter> &lhs, const SharedPtr<U, UDeleter> 
  * Compares the managed pointers of two SharedPtr instances for ordering.
  *
  * @tparam T Type of the first SharedPtr.
- * @tparam TDeleter Deleter type of the first SharedPtr.
  * @tparam U Type of the second SharedPtr.
- * @tparam UDeleter Deleter type of the second SharedPtr.
  * @param lhs Left-hand side SharedPtr.
  * @param rhs Right-hand side SharedPtr.
  * @return true if lhs's managed pointer is less than rhs's managed pointer.
  */
-template<typename T, typename TDeleter, typename U, typename UDeleter>
-bool	operator<(const SharedPtr<T, TDeleter> &lhs, const SharedPtr<U, UDeleter> &rhs)
+template<typename T, typename U>
+bool	operator<(const SharedPtr<T> &lhs, const SharedPtr<U> &rhs)
 {
 	return (lhs.get() < rhs.get());
 }
@@ -432,15 +399,13 @@ bool	operator<(const SharedPtr<T, TDeleter> &lhs, const SharedPtr<U, UDeleter> &
  * Compares the managed pointers of two SharedPtr instances for ordering.
  *
  * @tparam T Type of the first SharedPtr.
- * @tparam TDeleter Deleter type of the first SharedPtr.
  * @tparam U Type of the second SharedPtr.
- * @tparam UDeleter Deleter type of the second SharedPtr.
  * @param lhs Left-hand side SharedPtr.
  * @param rhs Right-hand side SharedPtr.
  * @return true if lhs's managed pointer is greater than rhs's managed pointer.
  */
-template<typename T, typename TDeleter, typename U, typename UDeleter>
-bool	operator>(const SharedPtr<T, TDeleter> &lhs, const SharedPtr<U, UDeleter> &rhs)
+template<typename T, typename U>
+bool	operator>(const SharedPtr<T> &lhs, const SharedPtr<U> &rhs)
 {
 	return (rhs < lhs);
 }
@@ -451,15 +416,13 @@ bool	operator>(const SharedPtr<T, TDeleter> &lhs, const SharedPtr<U, UDeleter> &
  * Compares the managed pointers of two SharedPtr instances for ordering.
  *
  * @tparam T Type of the first SharedPtr.
- * @tparam TDeleter Deleter type of the first SharedPtr.
  * @tparam U Type of the second SharedPtr.
- * @tparam UDeleter Deleter type of the second SharedPtr.
  * @param lhs Left-hand side SharedPtr.
  * @param rhs Right-hand side SharedPtr.
  * @return true if lhs's managed pointer is less than or equal to rhs's managed pointer.
  */
-template<typename T, typename TDeleter, typename U, typename UDeleter>
-bool	operator<=(const SharedPtr<T, TDeleter> &lhs, const SharedPtr<U, UDeleter> &rhs)
+template<typename T, typename U>
+bool	operator<=(const SharedPtr<T> &lhs, const SharedPtr<U> &rhs)
 {
 	return (!(lhs > rhs));
 }
@@ -470,15 +433,13 @@ bool	operator<=(const SharedPtr<T, TDeleter> &lhs, const SharedPtr<U, UDeleter> 
  * Compares the managed pointers of two SharedPtr instances for ordering.
  *
  * @tparam T Type of the first SharedPtr.
- * @tparam TDeleter Deleter type of the first SharedPtr.
  * @tparam U Type of the second SharedPtr.
- * @tparam UDeleter Deleter type of the second SharedPtr.
  * @param lhs Left-hand side SharedPtr.
  * @param rhs Right-hand side SharedPtr.
  * @return true if lhs's managed pointer is greater than or equal to rhs's managed pointer.
  */
-template<typename T, typename TDeleter, typename U, typename UDeleter>
-bool	operator>=(const SharedPtr<T, TDeleter> &lhs, const SharedPtr<U, UDeleter> &rhs)
+template<typename T, typename U>
+bool	operator>=(const SharedPtr<T> &lhs, const SharedPtr<U> &rhs)
 {
 	return (!(lhs < rhs));
 }
@@ -489,13 +450,12 @@ bool	operator>=(const SharedPtr<T, TDeleter> &lhs, const SharedPtr<U, UDeleter> 
  * Compares the managed pointer of a SharedPtr with a raw pointer for equality.
  *
  * @tparam T Type of the SharedPtr.
- * @tparam Deleter Deleter type of the SharedPtr.
  * @param lhs SharedPtr instance.
  * @param null_ptr Raw pointer to compare.
  * @return true if the SharedPtr manages the same pointer as null_ptr.
  */
-template<typename T, typename Deleter>
-bool operator==(const SharedPtr<T, Deleter> &lhs, const T *null_ptr) throw()
+template<typename T>
+bool operator==(const SharedPtr<T> &lhs, const T *null_ptr) throw()
 {
 	return (lhs.get() == null_ptr);
 }
@@ -506,13 +466,12 @@ bool operator==(const SharedPtr<T, Deleter> &lhs, const T *null_ptr) throw()
  * Compares the managed pointer of a SharedPtr with a raw pointer for equality.
  *
  * @tparam T Type of the SharedPtr.
- * @tparam Deleter Deleter type of the SharedPtr.
  * @param null_ptr Raw pointer to compare.
  * @param rhs SharedPtr instance.
  * @return true if the SharedPtr manages the same pointer as null_ptr.
  */
-template<typename T, typename Deleter>
-bool operator==(const T *null_ptr, const SharedPtr<T, Deleter> &rhs) throw()
+template<typename T>
+bool operator==(const T *null_ptr, const SharedPtr<T> &rhs) throw()
 {
 	return (rhs.get() == null_ptr);
 }
@@ -523,13 +482,12 @@ bool operator==(const T *null_ptr, const SharedPtr<T, Deleter> &rhs) throw()
  * Compares the managed pointer of a SharedPtr with a raw pointer for inequality.
  *
  * @tparam T Type of the SharedPtr.
- * @tparam Deleter Deleter type of the SharedPtr.
  * @param lhs SharedPtr instance.
  * @param null_ptr Raw pointer to compare.
  * @return true if the SharedPtr manages a different pointer than null_ptr.
  */
-template<typename T, typename Deleter>
-bool operator!=(const SharedPtr<T, Deleter> &lhs, const T *null_ptr) throw()
+template<typename T>
+bool operator!=(const SharedPtr<T> &lhs, const T *null_ptr) throw()
 {
 	return (!(lhs == null_ptr));
 }
@@ -540,13 +498,12 @@ bool operator!=(const SharedPtr<T, Deleter> &lhs, const T *null_ptr) throw()
  * Compares the managed pointer of a SharedPtr with a raw pointer for inequality.
  *
  * @tparam T Type of the SharedPtr.
- * @tparam Deleter Deleter type of the SharedPtr.
  * @param null_ptr Raw pointer to compare.
  * @param rhs SharedPtr instance.
  * @return true if the SharedPtr manages a different pointer than null_ptr.
  */
-template<typename T, typename Deleter>
-bool operator!=(const T *null_ptr, const SharedPtr<T, Deleter> &rhs) throw()
+template<typename T>
+bool operator!=(const T *null_ptr, const SharedPtr<T> &rhs) throw()
 {
 	return (!(rhs.get() == null_ptr));
 }
