@@ -18,7 +18,7 @@
  * @brief
  */
 
-#include "common/core/utils/algoUtils.hpp"
+#include "core/utils/algoUtils.hpp"
 #include "Deleters.hpp"
 #include <cstddef>
 

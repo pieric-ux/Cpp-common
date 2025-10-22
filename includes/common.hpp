@@ -21,15 +21,15 @@
  * to provide convenient access to commonly used components throughout the project.
  */
 
-#include "common/core/raii/Deleters.hpp"
-#include "common/core/raii/SharedPtr.hpp"
-#include "common/core/raii/UniquePtr.hpp"
+#include "core/raii/Deleters.hpp"
+#include "core/raii/SharedPtr.hpp"
+#include "core/raii/UniquePtr.hpp"
 
-#include "common/core/utils/algoUtils.hpp"
-#include "common/core/utils/Directory.hpp"
-#include "common/core/utils/fileUtils.hpp"
-#include "common/core/utils/stringUtils.hpp"
-#include "common/core/utils/timeUtils.hpp"
+#include "core/utils/algoUtils.hpp"
+#include "core/utils/Directory.hpp"
+#include "core/utils/fileUtils.hpp"
+#include "core/utils/stringUtils.hpp"
+#include "core/utils/timeUtils.hpp"
 
 #include "loader/Loader.hpp"
 

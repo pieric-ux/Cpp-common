@@ -19,9 +19,10 @@
  * with customizable deleter.
  */
 
-#include "common/core/utils/algoUtils.hpp"
-#include "common/core/raii/Deleters.hpp"
+#include "core/utils/algoUtils.hpp"
+#include "core/raii/Deleters.hpp"
 #include <cstddef>
+#include <cstdio>
 
 namespace common
 {
@@ -29,6 +30,20 @@ namespace core
 {
 namespace raii
 {
+
+/**
+ * @class SharedPtrControlBlock
+ * @brief [TODO:description]
+ *
+ */
+struct SharedPtrControlBlock 
+{
+	void			*ptr;
+	IDeleter		*deleter;
+	std::size_t		count;
+
+	SharedPtrControlBlock(void *p, IDeleter *d) : ptr(p), deleter(d), count(1) {}
+};
 
 /**
  * @def MAKE_SHARED(TYPE, ...)
@@ -56,30 +71,26 @@ template<typename T> class SharedPtr;
  *
  * @tparam T Type of the managed object.
  */
-template<typename T>
 class SharedPtrBase
 {
 	public:
-		void			reset(T *ptr = 0) throw();
-		void			swap(SharedPtrBase &other) throw();
-
-		T				*get() const throw();
-
 		std::size_t		useCount() const throw();
 		bool			unique() const throw();
 
 		operator bool() const throw();
 
 	protected:
-		T				*_ptr;
-		IDeleter		*_deleter;
-		std::size_t		*_count;
+		SharedPtrControlBlock *_cb;
 
-		explicit SharedPtrBase(T *ptr = 0, IDeleter *deleter = 0) throw();
+		explicit SharedPtrBase(void *ptr = 0, IDeleter *deleter = 0) throw();
 		~SharedPtrBase();
 
 		SharedPtrBase(const SharedPtrBase &rhs) throw();
+		
 		SharedPtrBase &operator=(const SharedPtrBase &rhs) throw();
+		
+		void	reset(void *ptr = 0) throw();
+		void	swap(SharedPtrBase &other) throw();
 
 		template<typename X, typename Y>
 		friend SharedPtr<X> staticPointerCast(const SharedPtr<Y> &rhs) throw();
@@ -103,21 +114,19 @@ class SharedPtrBase
  * @tparam T Type of the managed object.
  */
 template<typename T>
-class SharedPtr : public SharedPtrBase<T>
+class SharedPtr : public SharedPtrBase
 {
 	public:
-		typedef SharedPtrBase<T> Base;
-
-		explicit SharedPtr(T *ptr = 0) throw() : Base(ptr) {}
+		explicit SharedPtr(T *ptr = 0) throw() : SharedPtrBase(ptr, ptr ? static_cast<IDeleter *>(new DefaultDelete<T>()) : 0) {}
 		~SharedPtr() {}
 
-		SharedPtr(const SharedPtr &rhs) throw() : Base(rhs) {}
+		SharedPtr(const SharedPtr &rhs) throw() : SharedPtrBase(rhs) {}
 		SharedPtr &operator=(const SharedPtr &rhs) throw()
 		{
-			Base::operator=(rhs);
+			SharedPtrBase::operator=(rhs);
 			return (*this);
 		}
-
+		T	*get() const throw();
 		T	*operator->() const throw();
 		T	&operator*() const throw();
 };
@@ -131,18 +140,16 @@ class SharedPtr : public SharedPtrBase<T>
  * @tparam T Type of the managed array elements.
  */
 template<typename T>
-class SharedPtr<T[]> : SharedPtrBase<T>
+class SharedPtr<T[]> : public SharedPtrBase
 {
 	public:
-		typedef SharedPtrBase<T> Base;
-
-		explicit SharedPtr(T *ptr = 0) throw() : Base(ptr) {}
+		explicit SharedPtr(T *ptr = 0) throw() : SharedPtrBase(ptr, ptr ? static_cast<IDeleter *>(new DefaultDelete<T[]>()) : 0) {}
 		~SharedPtr() {}
 
-		SharedPtr(const SharedPtr &rhs) throw() : Base(rhs) {}
+		SharedPtr(const SharedPtr &rhs) throw() : SharedPtrBase(rhs) {}
 		SharedPtr &operator=(const SharedPtr &rhs) throw()
 		{
-			Base::operator=(rhs);
+			SharedPtrBase::operator=(rhs);
 			return (*this);
 		}
 
@@ -156,11 +163,13 @@ class SharedPtr<T[]> : SharedPtrBase<T>
  * @param ptr The pointer to manage.
  * @param deleter The deleter to use.
  */
-template<typename T>
-SharedPtrBase<T>::SharedPtrBase(T *ptr, IDeleter *deleter) throw() : _ptr(ptr), _deleter(deleter ? deleter : new DefaultDelete<T>()), _count(0)
+SharedPtrBase::SharedPtrBase(void *ptr, IDeleter *deleter) throw() : _cb(0)
 {
-	if (this->_ptr)
-		this->_count = new std::size_t(1);
+	if (ptr)
+	{
+		this->_cb = new SharedPtrControlBlock(ptr, deleter);
+		std::printf("[SharedPtrBase] Construct: cb=%p val=%zu\n", (void *) _cb, _cb->count);
+	}
 }
 
 /**
@@ -168,12 +177,9 @@ SharedPtrBase<T>::SharedPtrBase(T *ptr, IDeleter *deleter) throw() : _ptr(ptr), 
  *
  * @tparam T Type of the managed object.
  */
-template<typename T>
-SharedPtrBase<T>::~SharedPtrBase()
+SharedPtrBase::~SharedPtrBase()
 {
 	reset();
-	if (this->_deleter)
-		delete this->_deleter;
 }
 
 /**
@@ -182,11 +188,13 @@ SharedPtrBase<T>::~SharedPtrBase()
  * @tparam T Type of the managed object.
  * @param rhs SharedPtrBase to copy from.
  */
-template<typename T>
-SharedPtrBase<T>::SharedPtrBase(const SharedPtrBase &rhs) throw() : _ptr(rhs._ptr), _deleter(rhs._deleter), _count(rhs._count)
+SharedPtrBase::SharedPtrBase(const SharedPtrBase &rhs) throw() : _cb(rhs._cb) 
 {
-	if (this->_count)
-		++(this->_count);
+	if (this->_cb)
+	{
+		++this->_cb->count;
+       printf("[SharedPtrBase] CopyConstruct: cb=%p val=%zu\n", (void*)_cb, _cb->count);
+	}
 }
 
 /**
@@ -196,17 +204,17 @@ SharedPtrBase<T>::SharedPtrBase(const SharedPtrBase &rhs) throw() : _ptr(rhs._pt
  * @param rhs SharedPtrBase to assign from.
  * @return Reference to this instance.
  */
-template<typename T>
-SharedPtrBase<T>	&SharedPtrBase<T>::operator=(const SharedPtrBase &rhs) throw()
+SharedPtrBase	&SharedPtrBase::operator=(const SharedPtrBase &rhs) throw()
 {
 	if (this != &rhs)
 	{
 		this->reset();
-		this->_ptr = rhs._ptr;
-		this->_deleter = rhs._deleter;
-		this->_count = rhs._count;
-		if (this->_count)
-			++(*this->_count);
+		this->_cb = rhs._cb;
+		if (this->_cb)
+		{
+			++this->_cb->count;
+            printf("[SharedPtrBase] Assign: _cb=%p count=%zu\n", (void*)_cb, _cb->count);
+		}
 	}
 	return (*this);
 }
@@ -217,27 +225,23 @@ SharedPtrBase<T>	&SharedPtrBase<T>::operator=(const SharedPtrBase &rhs) throw()
  * @tparam T Type of the managed object.
  * @param ptr The new pointer to manage.
  */
-template<typename T>
-void	SharedPtrBase<T>::reset(T *ptr) throw()
+void	SharedPtrBase::reset(void *ptr) throw()
 {
-	if (this->_ptr == ptr)
-		return ;
-	if (this->_count && --(*this->_count) == 0)
+	if (this->_cb && --this->_cb->count == 0)
 	{
-		if (this->_deleter)
-			this->_deleter->destroy(this->_ptr);
-		delete this->_count;
+		std::printf("[SharedPtrBase] Reset: deleting cb=%p\n", (void*)_cb);
+		if (this->_cb->ptr && this->_cb->deleter)
+		{
+			this->_cb->deleter->destroy(this->_cb->ptr);
+			delete this->_cb->deleter;
+		}
+		delete this->_cb;
 	}
-
+	this->_cb = 0;
 	if (ptr)
 	{
-		this->_ptr = ptr;
-		this->_count = new std::size_t(1);
-	}
-	else
-	{
-		this->_ptr = 0;
-		this->_count = 0;
+		this->_cb = new SharedPtrControlBlock(ptr, 0);
+		std::printf("[SharedPtrBase] Reset: new cb=%p count=%zu\n", (void*)_cb, _cb->count);
 	}
 }
 
@@ -247,24 +251,9 @@ void	SharedPtrBase<T>::reset(T *ptr) throw()
  * @tparam T Type of the managed object.
  * @param other The other SharedPtrBase to swap with.
  */
-template<typename T>
-void	SharedPtrBase<T>::swap(SharedPtrBase &other) throw()
+void	SharedPtrBase::swap(SharedPtrBase &other) throw()
 {
-	utils::swap(this->_ptr, other._ptr);
-	utils::swap(this->_deleter, other._deleter);
-	utils::swap(this->_count, other._count);
-}
-
-/**
- * @brief Gets the managed pointer.
- *
- * @tparam T Type of the managed object.
- * @return The managed pointer.
- */
-template<typename T>
-T	*SharedPtrBase<T>::get() const throw()
-{
-	return (this->_ptr);
+	utils::swap(this->_cb, other._cb);
 }
 
 /**
@@ -273,10 +262,9 @@ T	*SharedPtrBase<T>::get() const throw()
  * @tparam T Type of the managed object.
  * @return Reference count.
  */
-template<typename T>
-std::size_t		SharedPtrBase<T>::useCount() const throw()
+std::size_t		SharedPtrBase::useCount() const throw()
 {
-	return (this->_count ? *this->_count : 0);
+	return (this->_cb ? this->_cb->count : 0);
 }
 
 /**
@@ -285,8 +273,7 @@ std::size_t		SharedPtrBase<T>::useCount() const throw()
  * @tparam T Type of the managed object.
  * @return True if unique, false otherwise.
  */
-template<typename T>
-bool	SharedPtrBase<T>::unique() const throw()
+bool	SharedPtrBase::unique() const throw()
 {
 	return (this->useCount() == 1);
 }
@@ -299,10 +286,21 @@ bool	SharedPtrBase<T>::unique() const throw()
  * @tparam T Type of the managed object.
  * @return true if the managed pointer is not null, false otherwise.
  */
-template<typename T>
-SharedPtrBase<T>::operator bool() const throw()
+SharedPtrBase::operator bool() const throw()
 {
-	return (this->_ptr != 0);
+	return (this->_cb && this->_cb->ptr != 0);
+}
+
+/**
+ * @brief [TODO:description]
+ *
+ * @tparam T [TODO:tparam]
+ * @return [TODO:return]
+ */
+template<typename T>
+T	*SharedPtr<T>::get() const throw()
+{
+	return (static_cast<T *>(this->_cb ? this->_cb->ptr : 0));
 }
 
 /**
@@ -314,7 +312,7 @@ SharedPtrBase<T>::operator bool() const throw()
 template<typename T>
 T	*SharedPtr<T>::operator->() const throw()
 {
-	return (this->_ptr);
+	return (this->get());
 }
 
 /**
@@ -326,7 +324,7 @@ T	*SharedPtr<T>::operator->() const throw()
 template<typename T>
 T	&SharedPtr<T>::operator*() const throw()
 {
-	return (*this->_ptr);
+	return (*this->get());
 }
 
 /**
@@ -339,7 +337,7 @@ T	&SharedPtr<T>::operator*() const throw()
 template<typename T>
 T	&SharedPtr<T[]>::operator[](std::size_t i) const
 {
-	return (this->_ptr[i]);
+	return (static_cast<T *>(this->_cb->ptr)[i]);
 }
 
 /**
@@ -521,14 +519,11 @@ SharedPtr<T> staticPointerCast(const SharedPtr<U> &rhs) throw()
 {
     T *ptr = static_cast<T *>(rhs.get());
 	raii::SharedPtr<T> result;
-	if (ptr)
-	{
-		result._ptr = ptr;
-		result._count = rhs._count;
-		result._deleter = rhs._deleter;
-		if (result._count)
-			++(*result._count);
-	}
+	result._cb = rhs._cb;
+	if (ptr && result._cb)
+		++result._cb->count;
+	else
+		result._cb = 0;
 	return (result);
 }
 
@@ -545,14 +540,13 @@ SharedPtr<T> dynamicPointerCast(const SharedPtr<U> &rhs) throw()
 {
 	T *ptr = dynamic_cast<T *>(rhs.get());
 	raii::SharedPtr<T> result;
-	if (ptr)
+	if (ptr && rhs._cb)
 	{
-		result._ptr = ptr;
-		result._count = rhs._count;
-		result._deleter = rhs._deleter;
-		if (result._count)
-			++(*result._count);
+		result._cb = rhs._cb;
+		++result._cb->count;
 	}
+	else
+		result._cb = 0;
 	return (result);
 }
 
@@ -569,14 +563,11 @@ SharedPtr<T> constPointerCast(const SharedPtr<U> &rhs) throw()
 {
 	T *ptr = const_cast<T *>(rhs.get());
 	raii::SharedPtr<T> result;
-	if (ptr)
-	{
-		result._ptr = ptr;
-		result._count = rhs._count;
-		result._deleter = rhs._deleter;
-		if (result._count)
-			++(*result._count);
-	}
+	result._cb = rhs._cb;
+	if (ptr && result._cb)
+		++result._cb->count;
+	else
+		result._cb = 0;
 	return (result);
 }
 
@@ -593,14 +584,11 @@ SharedPtr<T> reinterpretPointerCast(const SharedPtr<U> &rhs) throw()
 {
 	T *ptr = reinterpret_cast<T *>(rhs.get());
 	raii::SharedPtr<T> result;
-	if (ptr)
-	{
-		result._ptr = ptr;
-		result._count = rhs._count;
-		result._deleter = rhs._deleter;
-		if (result._count)
-			++(*result._count);
-	}
+	result._cb = rhs._cb;
+	if (ptr && result._cb)
+		++result._cb->count;
+	else
+		result._cb = 0;
 	return (result);
 }
 

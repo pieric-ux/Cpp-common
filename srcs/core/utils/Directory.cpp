@@ -15,7 +15,7 @@
  * @brief Implementation of the Directory and DirectoryIterator classes for directory traversal utilities.
  */
 
-#include "common/core/utils/Directory.hpp"
+#include "core/utils/Directory.hpp"
 #include <cerrno>
 #include <cstring>
 #include <dirent.h>
