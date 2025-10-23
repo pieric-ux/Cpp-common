@@ -35,7 +35,7 @@ namespace raii
  *
  * Constructs a UniquePtr of the specified TYPE, forwarding any constructor arguments.
  */
-#define MAKE_UNIQUE(TYPE, ...)			UniquePtr<TYPE>(new TYPE(__VA_ARGS__))
+#define MAKE_UNIQUE(TYPE, ...)			common::core::raii::UniquePtr<TYPE>(new TYPE(__VA_ARGS__))
 
 /**
  * @def MAKE_UNIQUE_ARRAY(TYPE, SIZE)
@@ -43,7 +43,7 @@ namespace raii
  *
  * Constructs a UniquePtr for an array of TYPE with the given SIZE.
  */
-#define MAKE_UNIQUE_ARRAY(TYPE, SIZE)	UniquePtr<TYPE[]>(new TYPE[SIZE])
+#define MAKE_UNIQUE_ARRAY(TYPE, SIZE)	common::core::raii::UniquePtr<TYPE[]>(new TYPE[SIZE])
 
 /**
  * @class UniquePtrBase
