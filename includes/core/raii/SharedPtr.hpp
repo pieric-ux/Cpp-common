@@ -15,11 +15,9 @@
 
 /**
  * @file SharedPtr.hpp
- * @brief Implementation of a reference-counted shared ownership smart pointer 
- * with customizable deleter.
+ * @brief Reference-counted shared ownership smart pointer implementation.
  */
 
-#include "core/utils/algoUtils.hpp"
 #include "core/raii/Deleters.hpp"
 #include <cstddef>
 #include <cstdio>
@@ -32,9 +30,10 @@ namespace raii
 {
 
 /**
- * @class SharedPtrControlBlock
- * @brief [TODO:description]
+ * @struct SharedPtrControlBlock
+ * @brief Internal control block for SharedPtr reference counting.
  *
+ * Holds the managed pointer, deleter, and reference count.
  */
 struct SharedPtrControlBlock 
 {
@@ -68,8 +67,6 @@ template<typename T> class SharedPtr;
  * @brief Base class for reference-counted shared ownership smart pointers.
  *
  * Manages a pointer, a deleter, and a reference count for shared ownership.
- *
- * @tparam T Type of the managed object.
  */
 class SharedPtrBase
 {
@@ -157,145 +154,10 @@ class SharedPtr<T[]> : public SharedPtrBase
 };
 
 /**
- * @brief Constructs a SharedPtrBase with a pointer and deleter.
+ * @brief Get the raw pointer to the managed object.
  *
  * @tparam T Type of the managed object.
- * @param ptr The pointer to manage.
- * @param deleter The deleter to use.
- */
-SharedPtrBase::SharedPtrBase(void *ptr, IDeleter *deleter) throw() : _cb(0)
-{
-	if (ptr)
-	{
-		this->_cb = new SharedPtrControlBlock(ptr, deleter);
-		std::printf("[SharedPtrBase] Construct: cb=%p val=%zu\n", (void *) _cb, _cb->count);
-	}
-}
-
-/**
- * @brief Destructor. Decrements reference count and deletes managed pointer if needed.
- *
- * @tparam T Type of the managed object.
- */
-SharedPtrBase::~SharedPtrBase()
-{
-	reset();
-}
-
-/**
- * @brief Copy constructor. Increments reference count.
- *
- * @tparam T Type of the managed object.
- * @param rhs SharedPtrBase to copy from.
- */
-SharedPtrBase::SharedPtrBase(const SharedPtrBase &rhs) throw() : _cb(rhs._cb) 
-{
-	if (this->_cb)
-	{
-		++this->_cb->count;
-       printf("[SharedPtrBase] CopyConstruct: cb=%p val=%zu\n", (void*)_cb, _cb->count);
-	}
-}
-
-/**
- * @brief Assignment operator. Handles reference count and pointer management.
- *
- * @tparam T Type of the managed object.
- * @param rhs SharedPtrBase to assign from.
- * @return Reference to this instance.
- */
-SharedPtrBase	&SharedPtrBase::operator=(const SharedPtrBase &rhs) throw()
-{
-	if (this != &rhs)
-	{
-		this->reset();
-		this->_cb = rhs._cb;
-		if (this->_cb)
-		{
-			++this->_cb->count;
-            printf("[SharedPtrBase] Assign: _cb=%p count=%zu\n", (void*)_cb, _cb->count);
-		}
-	}
-	return (*this);
-}
-
-/**
- * @brief Replaces the managed pointer with a new one, updating reference count and deleting if necessary.
- *
- * @tparam T Type of the managed object.
- * @param ptr The new pointer to manage.
- */
-void	SharedPtrBase::reset(void *ptr) throw()
-{
-	if (this->_cb && --this->_cb->count == 0)
-	{
-		std::printf("[SharedPtrBase] Reset: deleting cb=%p\n", (void*)_cb);
-		if (this->_cb->ptr && this->_cb->deleter)
-		{
-			this->_cb->deleter->destroy(this->_cb->ptr);
-			delete this->_cb->deleter;
-		}
-		delete this->_cb;
-	}
-	this->_cb = 0;
-	if (ptr)
-	{
-		this->_cb = new SharedPtrControlBlock(ptr, 0);
-		std::printf("[SharedPtrBase] Reset: new cb=%p count=%zu\n", (void*)_cb, _cb->count);
-	}
-}
-
-/**
- * @brief Swaps the managed pointer, deleter, and reference count with another SharedPtrBase.
- *
- * @tparam T Type of the managed object.
- * @param other The other SharedPtrBase to swap with.
- */
-void	SharedPtrBase::swap(SharedPtrBase &other) throw()
-{
-	utils::swap(this->_cb, other._cb);
-}
-
-/**
- * @brief Gets the number of SharedPtr instances sharing ownership.
- *
- * @tparam T Type of the managed object.
- * @return Reference count.
- */
-std::size_t		SharedPtrBase::useCount() const throw()
-{
-	return (this->_cb ? this->_cb->count : 0);
-}
-
-/**
- * @brief Checks if this is the only SharedPtr owning the managed pointer.
- *
- * @tparam T Type of the managed object.
- * @return True if unique, false otherwise.
- */
-bool	SharedPtrBase::unique() const throw()
-{
-	return (this->useCount() == 1);
-}
-
-/**
- * @brief Conversion operator to bool for SharedPtrBase.
- *
- * Allows checking if the SharedPtrBase currently manages a non-null pointer.
- *
- * @tparam T Type of the managed object.
- * @return true if the managed pointer is not null, false otherwise.
- */
-SharedPtrBase::operator bool() const throw()
-{
-	return (this->_cb && this->_cb->ptr != 0);
-}
-
-/**
- * @brief [TODO:description]
- *
- * @tparam T [TODO:tparam]
- * @return [TODO:return]
+ * @return Pointer to the managed object.
  */
 template<typename T>
 T	*SharedPtr<T>::get() const throw()

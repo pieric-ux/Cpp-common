@@ -18,10 +18,19 @@
  * @brief Default deleter functors for use with smart pointers.
  */
 
+namespace common
+{
+namespace core
+{
+namespace raii
+{
+
 /**
- * @struct IDeleter
- * @brief 
+ * @brief Interface for custom deleter functors.
  *
+ * Provides a virtual destructor and a pure virtual destroy method
+ * for deleting objects via a void pointer. Intended for use with
+ * smart pointer implementations that require custom deletion logic.
  */
 struct IDeleter
 {
@@ -31,17 +40,34 @@ struct IDeleter
 };
 
 /**
-* @struct DefaultDelete
-* @brief Default deleter for single objects.
-*
-* Provides a function call operator to delete a pointer to a single object.
-*
-* @tparam T Type of the object to delete.
-*/
+ * @brief Default deleter for single objects.
+ *
+ * Deletes an object of type T using the delete operator.
+ * Intended for use with smart pointers managing single objects.
+ *
+ * @tparam T Type of the object to delete.
+ */
 template<typename T>
 struct DefaultDelete : public IDeleter
 {
-	void	destroy(void *ptr) const throw() { delete static_cast<T *>(ptr); }
+	void	destroy(void *ptr) throw() { delete static_cast<T *>(ptr); }
 };
 
+/**
+ * @brief Default deleter for arrays.
+ *
+ * Deletes an array of type T using the delete[] operator.
+ * Intended for use with smart pointers managing arrays.
+ *
+ * @tparam T Type of the array elements to delete.
+ */
+template<typename T>
+struct DefaultDelete<T[]> : public IDeleter
+{
+	void	destroy(void *ptr) throw() { delete static_cast<T *>(ptr); }
+};
+
+} // !raii
+} // !core
+} // !common
 #endif // !DELETERS_HPP
