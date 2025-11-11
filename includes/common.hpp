@@ -23,6 +23,7 @@
 
 #include "core/raii/Deleters.hpp"
 #include "core/raii/SharedPtr.hpp"
+#include "core/raii/WeakPtr.hpp"
 #include "core/raii/UniquePtr.hpp"
 
 #include "core/utils/algoUtils.hpp"
@@ -32,5 +33,7 @@
 #include "core/utils/timeUtils.hpp"
 
 #include "loader/Loader.hpp"
+
+using namespace common::core;
 
 #endif // !COMMON_HPP

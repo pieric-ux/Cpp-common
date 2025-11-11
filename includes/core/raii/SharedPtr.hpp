@@ -40,8 +40,9 @@ struct SharedPtrControlBlock
 	void			*ptr;
 	IDeleter		*deleter;
 	std::size_t		count;
+	std::size_t		weak_count;
 
-	SharedPtrControlBlock(void *p, IDeleter *d) : ptr(p), deleter(d), count(1) {}
+	SharedPtrControlBlock(void *p, IDeleter *d) : ptr(p), deleter(d), count(1), weak_count(0) {}
 };
 
 /**
@@ -88,6 +89,10 @@ class SharedPtrBase
 		
 		void	reset(void *ptr = 0) throw();
 		void	swap(SharedPtrBase &other) throw();
+
+
+		template<typename X>
+		friend class WeakPtr;
 
 		template<typename X, typename Y>
 		friend SharedPtr<X> staticPointerCast(const SharedPtr<Y> &rhs) throw();

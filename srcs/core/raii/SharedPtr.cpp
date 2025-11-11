@@ -95,7 +95,8 @@ void	SharedPtrBase::reset(void *ptr) throw()
 			this->_cb->deleter->destroy(this->_cb->ptr);
 			delete this->_cb->deleter;
 		}
-		delete this->_cb;
+		if (this->_cb->weak_count == 0)
+			delete this->_cb;
 	}
 	this->_cb = 0;
 	if (ptr)

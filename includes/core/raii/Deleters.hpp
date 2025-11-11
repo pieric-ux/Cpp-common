@@ -65,7 +65,7 @@ struct DefaultDelete : public IDeleter
 template<typename T>
 struct DefaultDelete<T[]> : public IDeleter
 {
-	void	destroy(void *ptr) throw() { delete static_cast<T *>(ptr); }
+	void	destroy(void *ptr) throw() { delete[] static_cast<T *>(ptr); }
     void	operator()(T *ptr) const { delete[] ptr; }
 };
 

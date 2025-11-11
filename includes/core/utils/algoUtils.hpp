@@ -28,16 +28,20 @@ namespace utils
 {
 
 /**
- * @brief Swaps the values of two pointers of type T.
+ * @brief Swaps the values of two objects (or pointers) of type T by reference.
  *
- * @tparam T Type of the pointers to swap.
- * @param a Pointer to the first value.
- * @param b Pointer to the second value.
+ * This function takes its arguments by reference and swaps their values. If T
+ * is a pointer type (for example T = Foo*), the function will swap the
+ * pointers themselves (references to pointers).
+ *
+ * @tparam T Type of the values to swap (may be a pointer type).
+ * @param a Reference to the first value.
+ * @param b Reference to the second value.
  */
 template<typename T>
-void	swap(T *a, T *b)
+void	swap(T &a, T &b)
 {
-	T *tmp = a;
+	T tmp = a;
 	a = b;
 	b = tmp;
 }
