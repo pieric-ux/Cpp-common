@@ -17,8 +17,8 @@
  * @brief Implements a weak reference to an object managed by SharedPtr.
  */
 
-#include "core/utils/algoUtils.hpp"
-#include "SharedPtr.hpp"
+#include "common/core/utils/algoUtils.hpp"
+#include "common/core/raii/SharedPtr.hpp"
 
 namespace common
 {

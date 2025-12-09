@@ -18,7 +18,7 @@
  * @brief Reference-counted shared ownership smart pointer implementation.
  */
 
-#include "core/raii/Deleters.hpp"
+#include "common/core/raii/Deleters.hpp"
 #include <cstddef>
 #include <cstdio>
 

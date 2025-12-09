@@ -18,8 +18,8 @@
  * @brief
  */
 
-#include "core/utils/algoUtils.hpp"
-#include "Deleters.hpp"
+#include "common/core/utils/algoUtils.hpp"
+#include "common/core/raii/Deleters.hpp"
 #include <cstddef>
 
 namespace common
