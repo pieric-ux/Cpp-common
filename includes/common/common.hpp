@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef COMMON_HPP
-#define COMMON_HPP
+#ifndef COMMON_COMMON_HPP
+#define COMMON_COMMON_HPP
 
 /**
  * @file common.hpp
@@ -21,17 +21,17 @@
  * to provide convenient access to commonly used components throughout the project.
  */
 
-#include "common/core/raii/Deleters.hpp"
-#include "common/core/raii/SharedPtr.hpp"
-#include "common/core/raii/WeakPtr.hpp"
-#include "common/core/raii/UniquePtr.hpp"
+#include <common/core/raii/Deleters.hpp>
+#include <common/core/raii/SharedPtr.hpp>
+#include <common/core/raii/WeakPtr.hpp>
+#include <common/core/raii/UniquePtr.hpp>
 
-#include "common/core/utils/algoUtils.hpp"
-#include "common/core/utils/Directory.hpp"
-#include "common/core/utils/fileUtils.hpp"
-#include "common/core/utils/stringUtils.hpp"
-#include "common/core/utils/timeUtils.hpp"
+#include <common/core/utils/algoUtils.hpp>
+#include <common/core/utils/Directory.hpp>
+#include <common/core/utils/fileUtils.hpp>
+#include <common/core/utils/stringUtils.hpp>
+#include <common/core/utils/timeUtils.hpp>
 
-#include "common/loader/Loader.hpp"
+#include <common/loader/Loader.hpp>
 
-#endif // !COMMON_HPP
+#endif // !COMMON_COMMON_HPP

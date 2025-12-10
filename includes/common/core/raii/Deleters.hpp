@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef DELETERS_HPP
-#define DELETERS_HPP
+#ifndef COMMON_DELETERS_HPP
+#define COMMON_DELETERS_HPP
 
 /**
  * @file Deleters.hpp
@@ -72,4 +72,4 @@ struct DefaultDelete<T[]> : public IDeleter
 } // !raii
 } // !core
 } // !common
-#endif // !DELETERS_HPP
+#endif // !COMMON_DELETERS_HPP

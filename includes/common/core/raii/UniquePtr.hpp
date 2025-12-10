@@ -10,16 +10,16 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef UNIQUEPTR_HPP
-#define UNIQUEPTR_HPP
+#ifndef COMMON_UNIQUEPTR_HPP
+#define COMMON_UNIQUEPTR_HPP
 
 /**
  * @file UniquePtr.hpp
  * @brief
  */
 
-#include "common/core/utils/algoUtils.hpp"
-#include "common/core/raii/Deleters.hpp"
+#include <common/core/utils/algoUtils.hpp>
+#include <common/core/raii/Deleters.hpp>
 #include <cstddef>
 
 namespace common
@@ -464,4 +464,4 @@ bool operator!=(const T *null_ptr, const UniquePtr<T, Deleter> &rhs) throw()
 } // !core
 } // !common
 
-#endif // !UNIQUEPTR_HPP
+#endif // !COMMON_UNIQUEPTR_HPP

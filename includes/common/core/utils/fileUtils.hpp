@@ -15,8 +15,8 @@
  * @brief Utility functions for file name and path manipulations.
  */
 
-#ifndef FILEUTILS_HPP
-#define FILEUTILS_HPP
+#ifndef COMMON_FILEUTILS_HPP
+#define COMMON_FILEUTILS_HPP
 
 #include <string>
 
@@ -35,4 +35,4 @@ std::string	filenameNoPath(const std::string &path);
 } // !core
 } // !common
 
-#endif // !FILEUTILS_HPP
+#endif // !COMMON_FILEUTILS_HPP

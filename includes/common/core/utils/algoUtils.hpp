@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef ALGOUTILS_HPP
-#define ALGOUTILS_HPP
+#ifndef COMMON_ALGOUTILS_HPP
+#define COMMON_ALGOUTILS_HPP
 
 /**
  * @file UniquePtr.hpp
@@ -67,4 +67,4 @@ void	swap(T (&a)[N], T (&b)[N])
 } // !core
 } // !common
 
-#endif // !ALGOUTILS_HPP
+#endif // !COMMON_ALGOUTILS_HPP

@@ -9,16 +9,16 @@
 /*   Created: 2025/11/05                              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#ifndef WEAKPTR_HPP
-#define WEAKPTR_HPP
+#ifndef COMMON_WEAKPTR_HPP
+#define COMMON_WEAKPTR_HPP
 
 /**
  * @file WeakPtr.hpp
  * @brief Implements a weak reference to an object managed by SharedPtr.
  */
 
-#include "common/core/utils/algoUtils.hpp"
-#include "common/core/raii/SharedPtr.hpp"
+#include <common/core/utils/algoUtils.hpp>
+#include <common/core/raii/SharedPtr.hpp>
 
 namespace common
 {
@@ -200,4 +200,4 @@ void WeakPtr<T>::release() throw()
 } // !core
 } // !common
 
-#endif // !WEAKPTR_HPP
+#endif // !COMMON_WEAKPTR_HPP

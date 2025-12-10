@@ -15,8 +15,8 @@
  * @brief String utility functions for common string operations.
  */
 
-#ifndef STRINGUTILS_HPP
-#define STRINGUTILS_HPP
+#ifndef COMMON_STRINGUTILS_HPP
+#define COMMON_STRINGUTILS_HPP
 
 #include <string>
 #include <sstream>
@@ -49,4 +49,4 @@ std::string	toString(const T &value)
 } // !core
 } // !common
 
-#endif // !STRINGUTILS_HPP
+#endif // !COMMON_STRINGUTILS_HPP

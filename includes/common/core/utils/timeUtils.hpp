@@ -15,8 +15,8 @@
  * @brief Time utility functions for retrieving and formatting time values.
  */
 
-#ifndef TIMEUTILS_HPP
-#define TIMEUTILS_HPP
+#ifndef COMMON_TIMEUTILS_HPP
+#define COMMON_TIMEUTILS_HPP
 
 #include <string>
 #include <ctime>
@@ -37,4 +37,4 @@ std::string	timestamp(const time_t &time);
 } // !core
 } // !common
 
-#endif // !TIMEUTILS_HPP
+#endif // !COMMON_TIMEUTILS_HPP

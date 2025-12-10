@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "common/common.hpp"
+#include <common/common.hpp>
 
 /**
  * @file SharedPtr.cpp

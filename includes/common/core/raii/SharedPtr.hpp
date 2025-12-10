@@ -10,15 +10,15 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SHAREDPTR_HPP
-#define SHAREDPTR_HPP
+#ifndef COMMON_SHAREDPTR_HPP
+#define COMMON_SHAREDPTR_HPP
 
 /**
  * @file SharedPtr.hpp
  * @brief Reference-counted shared ownership smart pointer implementation.
  */
 
-#include "common/core/raii/Deleters.hpp"
+#include <common/core/raii/Deleters.hpp>
 #include <cstddef>
 #include <cstdio>
 
@@ -463,4 +463,4 @@ SharedPtr<T> reinterpretPointerCast(const SharedPtr<U> &rhs) throw()
 } // !core
 } // !common
 
-#endif // !SHAREDPTR_HPP
+#endif // !COMMON_SHAREDPTR_HPP

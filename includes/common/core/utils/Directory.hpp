@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef DIRECTORY_HPP
-#define DIRECTORY_HPP
+#ifndef COMMON_DIRECTORY_HPP
+#define COMMON_DIRECTORY_HPP
 
 /**
  * @file Directory.hpp
@@ -86,4 +86,4 @@ class DirectoryIterator
 } // !core
 } // !common
 
-#endif // !DIRECTORY_HPP
+#endif // !COMMON_DIRECTORY_HPP

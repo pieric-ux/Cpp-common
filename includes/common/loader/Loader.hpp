@@ -15,8 +15,8 @@
  * @brief Declaration of the Loader class for loading and parsing files from directories.
  */
 
-#ifndef LOADER_HPP
-#define LOADER_HPP
+#ifndef COMMON_LOADER_HPP
+#define COMMON_LOADER_HPP
 
 #include <fstream>
 #include <string>
@@ -53,4 +53,4 @@ class Loader
 } // !loader
 } // !common
 
-#endif // !LOADER_HPP
+#endif // !COMMON_LOADER_HPP
