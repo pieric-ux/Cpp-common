@@ -38,10 +38,9 @@ namespace utils
  */
 Directory::Directory(const std::string &filename) : dir(NULL)
 {
-	errno = 0;
 	this->dir = opendir(filename.c_str());
 	if (!dir)
-		throw std::runtime_error("Unable to open directory " + filename + ": " + strerror(errno));
+		throw std::runtime_error("Unable to open directory " + filename + ": " + std::strerror(errno));
 }
 
 /**
@@ -172,7 +171,7 @@ DirectoryIterator &DirectoryIterator::operator++()
 		errno = 0;
 		this->entry = readdir(this->dir->getDir());
 		if (!entry && errno)
-			throw std::runtime_error("Unable to read directory: " + std::string(strerror(errno)));
+			throw std::runtime_error("Unable to read directory: " + std::string(std::strerror(errno)));
 	}
 	return (*this);
 }

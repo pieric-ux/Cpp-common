@@ -66,7 +66,7 @@ void	Loader::loadDirectory(const std::string &dirname, const std::string &extens
 			}
 			catch (std::ios_base::failure &e)
 			{
-				throw std::runtime_error("Unable to open file " + filename + ": " + strerror(errno));
+				throw std::runtime_error("Unable to open file " + filename + ": " + std::strerror(errno));
 			}
 		}
 	}
