@@ -1,43 +1,80 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   common.hpp                                         :+:      :+:    :+:   */
+/*   TcpServer.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
 /*                                                     #+#    #+#             */
-/*   Created: 2025/10/16                              ###   ########.fr       */
+/*   Created: 2026/01/13                              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef COMMON_COMMON_HPP
-#define COMMON_COMMON_HPP
+#ifndef COMMON_TCPSERVER_HPP
+#define COMMON_TCPSERVER_HPP
 
 /**
- * @file common.hpp
- * @brief Common header aggregating core utilities and loader functionality.
- *
- * This header includes various utility and RAII classes, as well as the loader interface,
- * to provide convenient access to commonly used components throughout the project.
+ * @file
+ * @brief 
  */
 
+#include <cerrno>
+#include <common/core/net/sockets/ATcpSocket.hpp>
 #include <common/core/net/sockets/TcpClient.hpp>
-#include <common/core/net/sockets/TcpServer.hpp>
+#include <cstring>
+#include <stdexcept>
+#include <string>
+#include <sys/socket.h>
+#include <utility>
 
-#include <common/core/raii/Deleters.hpp>
-#include <common/core/raii/SharedPtr.hpp>
-#include <common/core/raii/WeakPtr.hpp>
-#include <common/core/raii/UniquePtr.hpp>
+namespace common
+{
+namespace core
+{
+namespace net
+{
 
-#include <common/core/utils/algoUtils.hpp>
-#include <common/core/utils/Directory.hpp>
-#include <common/core/utils/fileUtils.hpp>
-#include <common/core/utils/stringUtils.hpp>
-#include <common/core/utils/timeUtils.hpp>
+/**
+ * @class TcpServer
+ * @brief 
+ */
+class TcpServer : public ATcpSocket
+{
+	public:
+		TcpServer();
+		explicit TcpServer(int init_fd);
+		TcpServer(int init_domain, int init_protocol);
+		~TcpServer();
 
-#include <common/loader/Loader.hpp>
+		TcpServer(const TcpServer &rhs);
+		TcpServer &operator=(const TcpServer &rhs);
 
-#endif // !COMMON_COMMON_HPP
+		void	listen(int backlog = SOMAXCONN);
+
+		/**
+		 * @brief 
+		 *
+		 * @tparam T
+		 * @return
+		 */
+		   template<typename T>
+		   std::pair<TcpClient, T> accept()
+		   {
+			   T addr = {};
+			   socklen_t len = sizeof(T);
+			   int cfd = ::accept(_fd->get(), reinterpret_cast<struct sockaddr *>(&addr), &len);
+			   if (cfd == -1)
+				   throw std::runtime_error("accept failed: " + std::string(std::strerror(errno)));
+			   TcpClient cs(cfd);
+			   return std::make_pair(cs, addr);
+		   }
+};
+
+} // !net
+} // !core
+} // !common
+
+#endif // !COMMON_TCPSERVER_HPP
 
 /* ************************************************************************** */
 /*                                                                            */

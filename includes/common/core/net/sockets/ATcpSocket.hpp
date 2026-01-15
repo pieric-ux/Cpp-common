@@ -1,43 +1,56 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   common.hpp                                         :+:      :+:    :+:   */
+/*   ATcpSocket.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
 /*                                                     #+#    #+#             */
-/*   Created: 2025/10/16                              ###   ########.fr       */
+/*   Created: 2026/01/13                              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef COMMON_COMMON_HPP
-#define COMMON_COMMON_HPP
+#ifndef COMMON_ATCPSOCKET_HPP
+#define COMMON_ATCPSOCKET_HPP
 
 /**
- * @file common.hpp
- * @brief Common header aggregating core utilities and loader functionality.
- *
- * This header includes various utility and RAII classes, as well as the loader interface,
- * to provide convenient access to commonly used components throughout the project.
+ * @file
+ * @brief 
  */
 
-#include <common/core/net/sockets/TcpClient.hpp>
-#include <common/core/net/sockets/TcpServer.hpp>
+#include <common/core/net/sockets/ASocket.hpp>
 
-#include <common/core/raii/Deleters.hpp>
-#include <common/core/raii/SharedPtr.hpp>
-#include <common/core/raii/WeakPtr.hpp>
-#include <common/core/raii/UniquePtr.hpp>
+namespace common
+{
+namespace core
+{
+namespace net
+{
 
-#include <common/core/utils/algoUtils.hpp>
-#include <common/core/utils/Directory.hpp>
-#include <common/core/utils/fileUtils.hpp>
-#include <common/core/utils/stringUtils.hpp>
-#include <common/core/utils/timeUtils.hpp>
+/**
+ * @class ATcpSocket
+ * @brief 
+ */
+class ATcpSocket : public ASocket
+{
+	public:
+		ATcpSocket();
+		explicit ATcpSocket(int init_fd);
+		ATcpSocket(int init_domain, int init_protocol);
+		virtual ~ATcpSocket() = 0;
 
-#include <common/loader/Loader.hpp>
+		ATcpSocket(const ATcpSocket &rhs);
+		ATcpSocket &operator=(const ATcpSocket &rhs);
 
-#endif // !COMMON_COMMON_HPP
+		ssize_t recv(void *buffer, std::size_t length, int flags = 0);
+		ssize_t send(const void *buffer, std::size_t length, int flags = 0);
+};
+
+} // !net
+} // !core
+} // !common
+
+#endif // !COMMON_ATCPSOCKET_HPP
 
 /* ************************************************************************** */
 /*                                                                            */

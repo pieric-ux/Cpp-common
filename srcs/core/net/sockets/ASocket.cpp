@@ -1,43 +1,175 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   common.hpp                                         :+:      :+:    :+:   */
+/*   ASocket.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
 /*                                                     #+#    #+#             */
-/*   Created: 2025/10/16                              ###   ########.fr       */
+/*   Created: 2026/01/12                              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef COMMON_COMMON_HPP
-#define COMMON_COMMON_HPP
-
 /**
- * @file common.hpp
- * @brief Common header aggregating core utilities and loader functionality.
- *
- * This header includes various utility and RAII classes, as well as the loader interface,
- * to provide convenient access to commonly used components throughout the project.
+ * @file
+ * @brief 
  */
 
-#include <common/core/net/sockets/TcpClient.hpp>
-#include <common/core/net/sockets/TcpServer.hpp>
+#include <common/core/net/sockets/ASocket.hpp>
+#include <cerrno>
+#include <cstring>
+#include <stdexcept>
+#include <string>
+#include <sys/socket.h>
+#include <unistd.h>
 
-#include <common/core/raii/Deleters.hpp>
-#include <common/core/raii/SharedPtr.hpp>
-#include <common/core/raii/WeakPtr.hpp>
-#include <common/core/raii/UniquePtr.hpp>
+namespace common
+{
+namespace core
+{
+namespace net
+{
 
-#include <common/core/utils/algoUtils.hpp>
-#include <common/core/utils/Directory.hpp>
-#include <common/core/utils/fileUtils.hpp>
-#include <common/core/utils/stringUtils.hpp>
-#include <common/core/utils/timeUtils.hpp>
+/**
+ * @brief 
+ *
+ * @param init_fdRef
+ */
+ASocket::SocketFdRAII::SocketFdRAII(int init_fd) : _fdRef(init_fd) {}
 
-#include <common/loader/Loader.hpp>
+/**
+ * @brief 
+ */
+ASocket::SocketFdRAII::~SocketFdRAII()
+{
+	if (_fdRef != -1)
+	{
+		::close(_fdRef);
+		_fdRef = -1;
+	}
+}
 
-#endif // !COMMON_COMMON_HPP
+/**
+ * @brief 
+ *
+ * @return
+ */
+int	ASocket::SocketFdRAII::get() const
+{
+	return (_fdRef);
+}
+
+/**
+ * @brief 
+ *
+ * @param fd
+ */
+void	ASocket::SocketFdRAII::set(int new_fd)
+{
+	_fdRef = new_fd;
+}
+
+/**
+ * @brief 
+ */
+ASocket::ASocket() : _fd(new SocketFdRAII(-1)) {}
+
+/**
+ * @brief 
+ *
+ * @param init_fd
+ */
+ASocket::ASocket(int init_fd) : _fd(new SocketFdRAII(init_fd)) {}
+
+/**
+ * @brief 
+ *
+ * @param domain 
+ * @param type
+ * @param protocol
+ */
+ASocket::ASocket(int domain, int type, int protocol) : _fd(new SocketFdRAII(-1))
+{
+	int fd = ::socket(domain, type, protocol);
+	if (fd == -1)
+		throw std::runtime_error("socket failed: " + std::string(strerror(errno)));
+	_fd->set(fd);
+}
+
+/**
+ * @brief 
+ */
+ASocket::~ASocket() {}
+
+
+/**
+ * @brief
+ *
+ * @param rhs
+ */
+ASocket::ASocket(const ASocket &rhs) : _fd(const_cast<ASocket&>(rhs)._fd.release()) {}
+
+/**
+ * @brief 
+ *
+ * @param rhs
+ * @return
+ */
+ASocket &ASocket::operator=(const ASocket &rhs)
+{
+	if (this != &rhs)
+	{
+		_fd.reset(const_cast<ASocket&>(rhs)._fd.release());
+	}
+	return *this;
+}
+
+/**
+ * @brief 
+ *
+ * @param addr
+ */
+void	ASocket::bind(const struct sockaddr *addr, socklen_t addrlen)
+{
+	if (::bind(_fd->get(), addr, addrlen) == -1)
+		throw std::runtime_error("bind failed: " + std::string(std::strerror(errno)));
+}
+
+/**
+ * @brief 
+ *
+ * @return
+ */
+int	ASocket::getFd() const
+{
+	return _fd->get();
+}
+
+/**
+ * @brief 
+ */
+void	ASocket::close()
+{
+	if (_fd->get() != -1)
+		if (::close(_fd->get()) == -1)
+			throw std::runtime_error("close failed " + std::string(std::strerror(errno)));
+	_fd->set(-1);
+}
+
+/**
+ * @brief 
+ *
+ * @param how
+ */
+void	ASocket::shutdown(int how)
+{
+	if (::shutdown(_fd->get(), how) == -1)
+		throw std::runtime_error("shutdown failed: " + std::string(std::strerror(errno)));
+}
+
+} // !net
+} // !core
+} // !common
 
 /* ************************************************************************** */
 /*                                                                            */

@@ -1,43 +1,87 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   common.hpp                                         :+:      :+:    :+:   */
+/*   TcpClient.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
 /*                                                     #+#    #+#             */
-/*   Created: 2025/10/16                              ###   ########.fr       */
+/*   Created: 2026/01/13                              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef COMMON_COMMON_HPP
-#define COMMON_COMMON_HPP
+#include "common/core/net/sockets/ATcpSocket.hpp"
+#include <common/core/net/sockets/TcpClient.hpp>
+#include <stdexcept>
+#include <string>
+#include <sys/socket.h>
+
+namespace common
+{
+namespace core
+{
+namespace net
+{
 
 /**
- * @file common.hpp
- * @brief Common header aggregating core utilities and loader functionality.
- *
- * This header includes various utility and RAII classes, as well as the loader interface,
- * to provide convenient access to commonly used components throughout the project.
+ * @brief 
  */
+TcpClient::TcpClient() : ATcpSocket() {}
 
-#include <common/core/net/sockets/TcpClient.hpp>
-#include <common/core/net/sockets/TcpServer.hpp>
+/**
+ * @brief 
+ *
+ * @param init_fd
+ */
+TcpClient::TcpClient(int init_fd) : ATcpSocket(init_fd) {}
 
-#include <common/core/raii/Deleters.hpp>
-#include <common/core/raii/SharedPtr.hpp>
-#include <common/core/raii/WeakPtr.hpp>
-#include <common/core/raii/UniquePtr.hpp>
+/**
+ * @brief 
+ *
+ * @param init_domain
+ * @param init_protocol
+ */
+TcpClient::TcpClient(int init_domain, int init_protocol) : ATcpSocket(init_domain, init_protocol) {}
 
-#include <common/core/utils/algoUtils.hpp>
-#include <common/core/utils/Directory.hpp>
-#include <common/core/utils/fileUtils.hpp>
-#include <common/core/utils/stringUtils.hpp>
-#include <common/core/utils/timeUtils.hpp>
+/**
+ * @brief 
+ */
+TcpClient::~TcpClient() {}
 
-#include <common/loader/Loader.hpp>
+/**
+ * @brief 
+ *
+ * @param rhs
+ */
+TcpClient::TcpClient(const TcpClient &rhs) : ATcpSocket(rhs) {}
 
-#endif // !COMMON_COMMON_HPP
+/**
+ * @brief 
+ *
+ * @param rhs
+ * @return
+ */
+TcpClient &TcpClient::operator=(const TcpClient &rhs)
+{
+	ATcpSocket::operator=(rhs);
+	return (*this);
+}
+
+/**
+ * @brief 
+ *
+ * @param addr
+ * @param addrlen
+ */
+void	TcpClient::connect(const struct sockaddr *addr, socklen_t addrlen)
+{
+	if (::connect(_fd->get(), addr, addrlen) == -1)
+		throw std::runtime_error("connect failed: " + std::string(std::strerror(errno)));
+}
+
+} // !net
+} // !core
+} // !common
 
 /* ************************************************************************** */
 /*                                                                            */

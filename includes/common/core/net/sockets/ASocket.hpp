@@ -1,43 +1,150 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   common.hpp                                         :+:      :+:    :+:   */
+/*   ASocket.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
 /*                                                     #+#    #+#             */
-/*   Created: 2025/10/16                              ###   ########.fr       */
+/*   Created: 2026/01/12                              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef COMMON_COMMON_HPP
-#define COMMON_COMMON_HPP
+#ifndef COMMON_ASOCKET_HPP
+#define COMMON_ASOCKET_HPP
 
 /**
- * @file common.hpp
- * @brief Common header aggregating core utilities and loader functionality.
- *
- * This header includes various utility and RAII classes, as well as the loader interface,
- * to provide convenient access to commonly used components throughout the project.
+ * @file
+ * @brief 
  */
 
-#include <common/core/net/sockets/TcpClient.hpp>
-#include <common/core/net/sockets/TcpServer.hpp>
-
-#include <common/core/raii/Deleters.hpp>
-#include <common/core/raii/SharedPtr.hpp>
-#include <common/core/raii/WeakPtr.hpp>
+#include <common/core/net/sockets/ISocket.hpp>
 #include <common/core/raii/UniquePtr.hpp>
+#include <cerrno>
+#include <cstring>
+#include <stdexcept>
+#include <string>
+#include <sys/socket.h>
 
-#include <common/core/utils/algoUtils.hpp>
-#include <common/core/utils/Directory.hpp>
-#include <common/core/utils/fileUtils.hpp>
-#include <common/core/utils/stringUtils.hpp>
-#include <common/core/utils/timeUtils.hpp>
+namespace common
+{
+namespace core
+{
+namespace net
+{
 
-#include <common/loader/Loader.hpp>
+/**
+ * @class Socket
+ * @brief 
+ */
+class ASocket : public ISocket
+{
+	public:
+		ASocket();
+		explicit ASocket(int init_fd);
+		ASocket(int domain, int type, int protocol);
+		virtual ~ASocket() = 0;
 
-#endif // !COMMON_COMMON_HPP
+		ASocket(const ASocket &rhs);
+		ASocket &operator=(const ASocket &rhs);
+
+		void	bind(const struct sockaddr *addr, socklen_t addrlen);
+		void	close();
+		int		getFd() const;
+		void	shutdown(int how = SHUT_RDWR);
+
+		/**
+		 * @brief 
+		 *
+		 * @tparam T
+		 * @return
+		 */
+		template<typename T>
+		T	getsockname() const
+		{
+			T addr = {};
+			socklen_t len = sizeof(T);
+			if (::getsockname(_fd->get(), reinterpret_cast<struct sockaddr *>(&addr), &len) == -1)
+				throw std::runtime_error("getsockname failed: " + std::string(std::strerror(errno)));
+			return (addr);
+		}
+
+		/**
+		 * @brief 
+		 *
+		 * @tparam T
+		 * @return
+		 */
+		template<typename T>
+		T	getpeername() const
+		{
+			T addr = {};
+			socklen_t len = sizeof(T);
+			if (::getpeername(_fd->get(), reinterpret_cast<struct sockaddr *>(&addr), &len) == -1)
+				throw std::runtime_error("getpeername failed: " + std::string(std::strerror(errno)));
+			return (addr);
+		}
+
+		/**
+		 * @brief 
+		 *
+		 * @tparam T
+		 * @param optname
+		 * @param level
+		 * @return
+		 */
+		template<typename T>
+		T	getsockopt(int optname, int level = SOL_SOCKET)
+		{
+			T optval = {};
+			socklen_t len = sizeof(T);
+			if (::getsockopt(_fd->get(), level, optname, &optval, &len) == -1)
+				throw std::runtime_error("getsockopt failed: " + std::string(std::strerror(errno)));
+			return (optval);
+		}
+
+		/**
+		 * @brief 
+		 *
+		 * @tparam T
+		 * @param optname
+		 * @param optval
+		 * @param level
+		 */
+		template<typename T>
+		void	setsockopt(int optname, const T &optval, int level = SOL_SOCKET)
+		{
+			if (::setsockopt(_fd->get(), level, optname, &optval, sizeof(T)) == -1)
+				throw std::runtime_error("setsockopt failed: " + std::string(std::strerror(errno)));
+		}
+
+	protected:
+		/**
+		 * @class SocketFdRAII
+		 * @brief 
+		 *
+		 */
+		class SocketFdRAII
+		{
+			public:
+				explicit SocketFdRAII(int init_fd);
+				~SocketFdRAII();
+
+				int get() const;
+				void set(int new_fd);
+				
+			private:
+				int _fdRef;
+		};
+
+		common::core::raii::UniquePtr<SocketFdRAII> _fd;
+};
+
+} // !net
+} // !core
+} // !common
+
+#endif // !COMMON_ASOCKET_HPP
 
 /* ************************************************************************** */
 /*                                                                            */

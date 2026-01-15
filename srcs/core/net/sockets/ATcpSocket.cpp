@@ -1,43 +1,108 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   common.hpp                                         :+:      :+:    :+:   */
+/*   ATcpSocket.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
 /*                                                     #+#    #+#             */
-/*   Created: 2025/10/16                              ###   ########.fr       */
+/*   Created: 2026/01/13                              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef COMMON_COMMON_HPP
-#define COMMON_COMMON_HPP
+#include <cerrno>
+#include <common/core/net/sockets/ASocket.hpp>
+#include <common/core/net/sockets/ATcpSocket.hpp>
+#include <stdexcept>
+#include <sys/socket.h>
+
+namespace  common
+{
+namespace core
+{
+namespace net
+{
+
 
 /**
- * @file common.hpp
- * @brief Common header aggregating core utilities and loader functionality.
- *
- * This header includes various utility and RAII classes, as well as the loader interface,
- * to provide convenient access to commonly used components throughout the project.
+ * @brief 
  */
+ATcpSocket::ATcpSocket() : ASocket() {}
 
-#include <common/core/net/sockets/TcpClient.hpp>
-#include <common/core/net/sockets/TcpServer.hpp>
+/**
+ * @brief 
+ *
+ * @param init_fd
+ */
+ATcpSocket::ATcpSocket(int init_fd) : ASocket(init_fd) {}
 
-#include <common/core/raii/Deleters.hpp>
-#include <common/core/raii/SharedPtr.hpp>
-#include <common/core/raii/WeakPtr.hpp>
-#include <common/core/raii/UniquePtr.hpp>
+/**
+ * @brief 
+ *
+ * @param init_domain
+ * @param init_protocol
+ */
+ATcpSocket::ATcpSocket(int init_domain, int init_protocol): ASocket(init_domain, SOCK_STREAM, init_protocol) {}
 
-#include <common/core/utils/algoUtils.hpp>
-#include <common/core/utils/Directory.hpp>
-#include <common/core/utils/fileUtils.hpp>
-#include <common/core/utils/stringUtils.hpp>
-#include <common/core/utils/timeUtils.hpp>
+/**
+ * @brief 
+ */
+ATcpSocket::~ATcpSocket() {}
 
-#include <common/loader/Loader.hpp>
+/**
+ * @brief 
+ *
+ * @param rhs
+ */
+ATcpSocket::ATcpSocket(const ATcpSocket &rhs) : ASocket(rhs) {}
 
-#endif // !COMMON_COMMON_HPP
+/**
+ * @brief 
+ *
+ * @param rhs
+ * @return
+ */
+ATcpSocket &ATcpSocket::operator=(const ATcpSocket &rhs)
+{
+	ASocket::operator=(rhs);
+	return (*this);
+}
+
+/**
+ * @brief 
+ *
+ * @param buffer
+ * @param length
+ * @param flags 
+ * @return
+ */
+ssize_t	ATcpSocket::recv(void *buffer, std::size_t length, int flags)
+{
+	ssize_t rd;
+	if ((rd = ::recv(_fd->get(), buffer, length, flags)) == -1)
+		throw std::runtime_error("recv failed: " + std::string(std::strerror(errno)));
+	return (rd);
+}
+
+/**
+ * @brief 
+ *
+ * @param buffer
+ * @param length
+ * @param flags
+ * @return
+ */
+ssize_t ATcpSocket::send(const void *buffer, std::size_t length, int flags)
+{
+	ssize_t rd;
+	if ((rd = ::send(_fd->get(), buffer, length, flags)) == -1)
+		throw std::runtime_error("send failed: " + std::string(std::strerror(errno)));
+	return (rd);
+}
+
+} // !net
+} // !core
+} // !common
 
 /* ************************************************************************** */
 /*                                                                            */

@@ -8,6 +8,8 @@ NAME = libcommon.a
 # Source and object directories
 SRCDIR = srcs
 COREDIR = core
+NETDIR = net
+SOCKETDIR = sockets
 UTIlSDIR = utils
 RAIIDIR = raii
 LOADERDIR = loader
@@ -24,12 +26,14 @@ INCLUDES = -I includes
 vpath %.cpp \
 	$(SRCDIR) \
 	$(SRCDIR)/$(COREDIR) \
+	$(SRCDIR)/$(COREDIR)/$(NETDIR)/$(SOCKETDIR) \
 	$(SRCDIR)/$(COREDIR)/$(RAIIDIR) \
 	$(SRCDIR)/$(COREDIR)/$(UTIlSDIR) \
 	$(SRCDIR)/$(LOADERDIR)
 
 # Sources and object files
-SRCES = SharedPtr.cpp \
+SRCES = ASocket.cpp ATcpSocket.cpp TcpClient.cpp TcpServer.cpp \
+		SharedPtr.cpp \
 		Directory.cpp fileUtils.cpp stringUtils.cpp timeUtils.cpp \
 		Loader.cpp
 

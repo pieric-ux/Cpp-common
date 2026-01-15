@@ -1,43 +1,90 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   common.hpp                                         :+:      :+:    :+:   */
+/*   TcpServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
 /*                                                     #+#    #+#             */
-/*   Created: 2025/10/16                              ###   ########.fr       */
+/*   Created: 2026/01/13                              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef COMMON_COMMON_HPP
-#define COMMON_COMMON_HPP
-
 /**
- * @file common.hpp
- * @brief Common header aggregating core utilities and loader functionality.
- *
- * This header includes various utility and RAII classes, as well as the loader interface,
- * to provide convenient access to commonly used components throughout the project.
+ * @file
+ * @brief 
  */
 
-#include <common/core/net/sockets/TcpClient.hpp>
+#include <common/core/net/sockets/ATcpSocket.hpp>
 #include <common/core/net/sockets/TcpServer.hpp>
+#include <stdexcept>
+#include <sys/socket.h>
 
-#include <common/core/raii/Deleters.hpp>
-#include <common/core/raii/SharedPtr.hpp>
-#include <common/core/raii/WeakPtr.hpp>
-#include <common/core/raii/UniquePtr.hpp>
+namespace common
+{
+namespace core
+{
+namespace net
+{
 
-#include <common/core/utils/algoUtils.hpp>
-#include <common/core/utils/Directory.hpp>
-#include <common/core/utils/fileUtils.hpp>
-#include <common/core/utils/stringUtils.hpp>
-#include <common/core/utils/timeUtils.hpp>
+/**
+ * @brief 
+ */
+TcpServer::TcpServer() : ATcpSocket() {}
 
-#include <common/loader/Loader.hpp>
+/**
+ * @brief 
+ *
+ * @param init_fd
+ */
+TcpServer::TcpServer(int init_fd) : ATcpSocket(init_fd) {}
 
-#endif // !COMMON_COMMON_HPP
+/**
+ * @brief 
+ *
+ * @param init_domain
+ * @param init_protocol
+ */
+TcpServer::TcpServer(int init_domain, int init_protocol) : ATcpSocket(init_domain, init_protocol) {}
+
+/**
+ * @brief 
+ */
+TcpServer::~TcpServer() {}
+
+/**
+ * @brief 
+ *
+ * @param rhs
+ */
+TcpServer::TcpServer(const TcpServer &rhs) : ATcpSocket(rhs) {}
+
+/**
+ * @brief 
+ *
+ * @param rhs
+ * @return
+ */
+TcpServer &TcpServer::operator=(const TcpServer &rhs)
+{
+	ATcpSocket::operator=(rhs);
+	return (*this);
+}
+
+/**
+ * @brief 
+ *
+ * @param backlog
+ */
+void	TcpServer::listen(int backlog)
+{
+	if (::listen(_fd->get(), backlog) == -1)
+		throw std::runtime_error("listen failed: " + std::string(std::strerror(errno)));
+}
+
+} // !net
+} // !core
+} // !common
 
 /* ************************************************************************** */
 /*                                                                            */

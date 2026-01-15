@@ -1,43 +1,52 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   common.hpp                                         :+:      :+:    :+:   */
+/*   ISocket.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
 /*                                                     #+#    #+#             */
-/*   Created: 2025/10/16                              ###   ########.fr       */
+/*   Created: 2026/01/12                              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef COMMON_COMMON_HPP
-#define COMMON_COMMON_HPP
+#ifndef COMMON_ISOCKET_HPP
+#define COMMON_ISOCKET_HPP
 
 /**
- * @file common.hpp
- * @brief Common header aggregating core utilities and loader functionality.
- *
- * This header includes various utility and RAII classes, as well as the loader interface,
- * to provide convenient access to commonly used components throughout the project.
+ * @file
+ * @brief 
  */
 
-#include <common/core/net/sockets/TcpClient.hpp>
-#include <common/core/net/sockets/TcpServer.hpp>
+#include <sys/socket.h>
 
-#include <common/core/raii/Deleters.hpp>
-#include <common/core/raii/SharedPtr.hpp>
-#include <common/core/raii/WeakPtr.hpp>
-#include <common/core/raii/UniquePtr.hpp>
+namespace common
+{
+namespace core
+{
+namespace net
+{
 
-#include <common/core/utils/algoUtils.hpp>
-#include <common/core/utils/Directory.hpp>
-#include <common/core/utils/fileUtils.hpp>
-#include <common/core/utils/stringUtils.hpp>
-#include <common/core/utils/timeUtils.hpp>
+/**
+ * @class ISocket
+ * @brief 
+ */
+class ISocket
+{
+	public:
+		virtual ~ISocket() {};
 
-#include <common/loader/Loader.hpp>
+		virtual void	bind(const struct sockaddr *addr, socklen_t addrlen) = 0;
+		virtual void	close() = 0;
+		virtual int		getFd() const = 0;
+		virtual void	shutdown(int how = SHUT_RDWR) = 0;
+};
 
-#endif // !COMMON_COMMON_HPP
+} // !net
+} // !core
+} // !common
+
+#endif // !COMMON_ISOCKET_HPP
 
 /* ************************************************************************** */
 /*                                                                            */
