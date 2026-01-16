@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ASocket.hpp                                        :+:      :+:    :+:   */
+/*   ASocket.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
@@ -121,7 +121,7 @@ ASocket &ASocket::operator=(const ASocket &rhs)
 	{
 		_fd.reset(const_cast<ASocket&>(rhs)._fd.release());
 	}
-	return *this;
+	return (*this);
 }
 
 /**
@@ -142,7 +142,7 @@ void	ASocket::bind(const struct sockaddr *addr, socklen_t addrlen)
  */
 int	ASocket::getFd() const
 {
-	return _fd->get();
+	return (_fd->get());
 }
 
 /**

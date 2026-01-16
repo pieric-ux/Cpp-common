@@ -32,7 +32,7 @@ vpath %.cpp \
 	$(SRCDIR)/$(LOADERDIR)
 
 # Sources and object files
-SRCES = ASocket.cpp ATcpSocket.cpp TcpClient.cpp TcpServer.cpp \
+SRCES = ASocket.cpp ATcpSocket.cpp Addrinfo.cpp TcpClient.cpp TcpServer.cpp \
 		SharedPtr.cpp \
 		Directory.cpp fileUtils.cpp stringUtils.cpp timeUtils.cpp \
 		Loader.cpp

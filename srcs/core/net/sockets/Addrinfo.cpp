@@ -1,93 +1,104 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Deleters.hpp                                       :+:      :+:    :+:   */
+/*   Addrinfo.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
 /*                                                     #+#    #+#             */
-/*   Created: 2025/10/16                              ###   ########.fr       */
+/*   Created: 2026/01/15                              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef COMMON_DELETERS_HPP
-#define COMMON_DELETERS_HPP
-
 /**
- * @file Deleters.hpp
- * @brief Default deleter functors for use with smart pointers.
+ * @file Addrinfo.cpp
+ * @brief 
  */
 
+#include <common/core/raii/Deleters.hpp>
+#include <common/core/raii/SharedPtr.hpp>
+#include <common/core/net/sockets/Addrinfo.hpp>
 #include <netdb.h>
+#include <string>
 
 namespace common
 {
 namespace core
 {
-namespace raii
+namespace net
 {
 
 /**
- * @brief Interface for custom deleter functors.
- *
- * Provides a virtual destructor and a pure virtual destroy method
- * for deleting objects via a void pointer. Intended for use with
- * smart pointer implementations that require custom deletion logic.
+ * @brief 
  */
-struct IDeleter
-{
-	virtual ~IDeleter() {}
-
-	virtual void destroy(void *ptr) = 0;
-};
+Addrinfo::Addrinfo() : _res(NULL) {}
 
 /**
- * @brief Default deleter for single objects.
+ * @brief 
  *
- * Deletes an object of type T using the delete operator.
- * Intended for use with smart pointers managing single objects.
- *
- * @tparam T Type of the object to delete.
+ * @param hostname
+ * @param servname
+ * @param ai_flags
+ * @param ai_family
+ * @param ai_socktype
+ * @param ai_protocol
  */
-template<typename T>
-struct DefaultDelete : public IDeleter
+Addrinfo::Addrinfo(const char *hostname, const char *servname,
+				   int ai_flags, int ai_family,
+				   int ai_socktype, int ai_protocol)
 {
-	void	destroy(void *ptr) throw() { delete static_cast<T *>(ptr); }
-    void	operator()(T *ptr) const { delete ptr; }
-};
+	struct addrinfo hints = {}, *res = NULL;
+	int error;
+
+	hints.ai_flags = ai_flags;
+	hints.ai_family = ai_family;
+	hints.ai_socktype = ai_socktype;
+	hints.ai_protocol = ai_protocol;
+
+	error = getaddrinfo(hostname, servname, &hints, &res);
+	if (error)
+		throw std::runtime_error("getaddrinfo failed: " + std::string(gai_strerror(error)));
+	_res = common::core::raii::SharedPtr<struct addrinfo>(res, new raii::AddrinfoDeleter());
+}
 
 /**
- * @brief Default deleter for arrays.
- *
- * Deletes an array of type T using the delete[] operator.
- * Intended for use with smart pointers managing arrays.
- *
- * @tparam T Type of the array elements to delete.
+ * @brief 
  */
-template<typename T>
-struct DefaultDelete<T[]> : public IDeleter
-{
-	void	destroy(void *ptr) throw() { delete[] static_cast<T *>(ptr); }
-    void	operator()(T *ptr) const { delete[] ptr; }
-};
+Addrinfo::~Addrinfo() {}
 
 /**
- * @brief Deleter for addrinfo structures.
+ * @brief 
  *
- * Provides custom deletion logic for objects of type struct addrinfo,
- * using freeaddrinfo. Intended for use with smart pointers managing
- * addrinfo pointers returned by getaddrinfo.
+ * @param rhs
  */
-struct AddrinfoDeleter : public IDeleter
-{
-	void	destroy(void *ptr) throw() { freeaddrinfo(static_cast<struct addrinfo *>(ptr)); } 
-    void	operator()(struct addrinfo *ptr) const { freeaddrinfo(ptr); }
-};
+Addrinfo::Addrinfo(const Addrinfo &rhs) : _res(rhs._res) {}
 
-} // !raii
+/**
+ * @brief 
+ *
+ * @param rhs
+ * @return
+ */
+Addrinfo &Addrinfo::operator=(const Addrinfo &rhs)
+{
+	if (this != &rhs)
+		_res = rhs._res;
+	return (*this);
+}
+
+/**
+ * @brief 
+ *
+ * @return
+ */
+struct addrinfo *Addrinfo::getRes() const
+{
+	return (_res.get());
+}
+
+} // !net
 } // !core
 } // !common
-#endif // !COMMON_DELETERS_HPP
 
 /* ************************************************************************** */
 /*                                                                            */

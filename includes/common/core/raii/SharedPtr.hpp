@@ -120,6 +120,7 @@ class SharedPtr : public SharedPtrBase
 {
 	public:
 		explicit SharedPtr(T *ptr = 0) throw() : SharedPtrBase(ptr, ptr ? static_cast<IDeleter *>(new DefaultDelete<T>()) : 0) {}
+		SharedPtr(T *ptr, IDeleter *deleter) throw() : SharedPtrBase(ptr, deleter) {}
 		~SharedPtr() {}
 
 		SharedPtr(const SharedPtr &rhs) throw() : SharedPtrBase(rhs) {}
@@ -146,6 +147,7 @@ class SharedPtr<T[]> : public SharedPtrBase
 {
 	public:
 		explicit SharedPtr(T *ptr = 0) throw() : SharedPtrBase(ptr, ptr ? static_cast<IDeleter *>(new DefaultDelete<T[]>()) : 0) {}
+		SharedPtr(T *ptr, IDeleter *deleter) throw() : SharedPtrBase(ptr, deleter) {}
 		~SharedPtr() {}
 
 		SharedPtr(const SharedPtr &rhs) throw() : SharedPtrBase(rhs) {}

@@ -13,6 +13,11 @@
 #ifndef COMMON_TCPCLIENT_HPP
 #define COMMON_TCPCLIENT_HPP
 
+/**
+ * @file TcpClient.hpp
+ * @brief 
+ */
+
 #include <common/core/net/sockets/ATcpSocket.hpp>
 
 namespace common

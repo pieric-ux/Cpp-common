@@ -14,7 +14,7 @@
 #define COMMON_ASOCKET_HPP
 
 /**
- * @file
+ * @file ASocket.hpp
  * @brief 
  */
 
@@ -34,7 +34,7 @@ namespace net
 {
 
 /**
- * @class Socket
+ * @class ASocket
  * @brief 
  */
 class ASocket : public ISocket
@@ -134,6 +134,9 @@ class ASocket : public ISocket
 				void set(int new_fd);
 				
 			private:
+				SocketFdRAII(const SocketFdRAII &rhs);
+				SocketFdRAII &operator=(const SocketFdRAII &rhs);
+
 				int _fdRef;
 		};
 

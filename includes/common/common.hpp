@@ -21,6 +21,7 @@
  * to provide convenient access to commonly used components throughout the project.
  */
 
+#include <common/core/net/sockets/Addrinfo.hpp>
 #include <common/core/net/sockets/TcpClient.hpp>
 #include <common/core/net/sockets/TcpServer.hpp>
 

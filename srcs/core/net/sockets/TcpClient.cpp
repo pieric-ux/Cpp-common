@@ -10,6 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+/**
+ * @file TcpClient.cpp
+ * @brief 
+ */
+
 #include "common/core/net/sockets/ATcpSocket.hpp"
 #include <common/core/net/sockets/TcpClient.hpp>
 #include <stdexcept>
