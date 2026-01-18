@@ -47,7 +47,7 @@ ATcpSocket::ATcpSocket(int init_fd) : ASocket(init_fd) {}
  * @param init_domain
  * @param init_protocol
  */
-ATcpSocket::ATcpSocket(int init_domain, int init_protocol): ASocket(init_domain, SOCK_STREAM, init_protocol) {}
+ATcpSocket::ATcpSocket(int init_domain, int init_protocol, bool isNonblock): ASocket(init_domain, SOCK_STREAM, init_protocol, isNonblock) {}
 
 /**
  * @brief 

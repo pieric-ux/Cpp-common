@@ -42,7 +42,7 @@ class ASocket : public ISocket
 	public:
 		ASocket();
 		explicit ASocket(int init_fd);
-		ASocket(int domain, int type, int protocol);
+		ASocket(int domain, int type, int protocol, bool isNonblock);
 		virtual ~ASocket() = 0;
 
 		ASocket(const ASocket &rhs);
@@ -51,6 +51,8 @@ class ASocket : public ISocket
 		void	bind(const struct sockaddr *addr, socklen_t addrlen);
 		void	close();
 		int		getFd() const;
+		bool	getIsNonblock() const;
+		void	setIsNonblock(bool isNonblock);
 		void	shutdown(int how = SHUT_RDWR);
 
 		/**
@@ -141,6 +143,10 @@ class ASocket : public ISocket
 		};
 
 		common::core::raii::UniquePtr<SocketFdRAII> _fd;
+		bool										_isNonblock;
+
+		private:
+			int	getFlags() const;
 };
 
 } // !net

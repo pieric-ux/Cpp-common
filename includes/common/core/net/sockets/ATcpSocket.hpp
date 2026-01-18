@@ -36,7 +36,7 @@ class ATcpSocket : public ASocket
 	public:
 		ATcpSocket();
 		explicit ATcpSocket(int init_fd);
-		ATcpSocket(int init_domain, int init_protocol);
+		ATcpSocket(int init_domain, int init_protocol, bool isNonblock);
 		virtual ~ATcpSocket() = 0;
 
 		ATcpSocket(const ATcpSocket &rhs);

@@ -20,6 +20,7 @@
 #include <cstring>
 #include <stdexcept>
 #include <string>
+#include <fcntl.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -72,14 +73,19 @@ void	ASocket::SocketFdRAII::set(int new_fd)
 /**
  * @brief 
  */
-ASocket::ASocket() : _fd(new SocketFdRAII(-1)) {}
+ASocket::ASocket() : _fd(new SocketFdRAII(-1)), _isNonblock(false) {}
 
 /**
  * @brief 
  *
  * @param init_fd
  */
-ASocket::ASocket(int init_fd) : _fd(new SocketFdRAII(init_fd)) {}
+ASocket::ASocket(int init_fd) : _fd(new SocketFdRAII(init_fd))
+{
+	int flags = getFlags();
+
+	_isNonblock = (flags & O_NONBLOCK);
+}
 
 /**
  * @brief 
@@ -88,12 +94,15 @@ ASocket::ASocket(int init_fd) : _fd(new SocketFdRAII(init_fd)) {}
  * @param type
  * @param protocol
  */
-ASocket::ASocket(int domain, int type, int protocol) : _fd(new SocketFdRAII(-1))
+ASocket::ASocket(int domain, int type, int protocol, bool isNonblock) : _fd(new SocketFdRAII(-1))
 {
 	int fd = ::socket(domain, type, protocol);
 	if (fd == -1)
 		throw std::runtime_error("socket failed: " + std::string(strerror(errno)));
 	_fd->set(fd);
+
+	if (isNonblock)
+		setIsNonblock(isNonblock);
 }
 
 /**
@@ -107,7 +116,7 @@ ASocket::~ASocket() {}
  *
  * @param rhs
  */
-ASocket::ASocket(const ASocket &rhs) : _fd(const_cast<ASocket&>(rhs)._fd.release()) {}
+ASocket::ASocket(const ASocket &rhs) : _fd(const_cast<ASocket&>(rhs)._fd.release()), _isNonblock(rhs._isNonblock) {}
 
 /**
  * @brief 
@@ -120,6 +129,7 @@ ASocket &ASocket::operator=(const ASocket &rhs)
 	if (this != &rhs)
 	{
 		_fd.reset(const_cast<ASocket&>(rhs)._fd.release());
+		_isNonblock = rhs._isNonblock;
 	}
 	return (*this);
 }
@@ -147,6 +157,38 @@ int	ASocket::getFd() const
 
 /**
  * @brief 
+ *
+ * @return
+ */
+bool	ASocket::getIsNonblock() const
+{
+	return (_isNonblock);
+}
+
+/**
+ * @brief 
+ *
+ * @param isNonblock
+ */
+void	ASocket::setIsNonblock(bool isNonblock)
+{
+	int flags = getFlags();
+
+	if (!_isNonblock && isNonblock)
+	{
+		if (::fcntl(_fd->get(), F_SETFL, flags | O_NONBLOCK) == -1)
+			throw std::runtime_error("fcntl failed: " + std::string(std::strerror(errno)));
+	}
+	else if (_isNonblock && !isNonblock)
+	{
+		if (::fcntl(_fd->get(), F_SETFL, flags & ~O_NONBLOCK) == -1)
+			throw std::runtime_error("fcntl failed: " + std::string(std::strerror(errno)));
+	}
+	_isNonblock = isNonblock;
+}
+
+/**
+ * @brief 
  */
 void	ASocket::close()
 {
@@ -165,6 +207,20 @@ void	ASocket::shutdown(int how)
 {
 	if (::shutdown(_fd->get(), how) == -1)
 		throw std::runtime_error("shutdown failed: " + std::string(std::strerror(errno)));
+}
+
+/**
+ * @brief 
+ *
+ * @return
+ */
+int	ASocket::getFlags() const
+{
+	int flags = fcntl(_fd->get(), F_GETFL);
+	if (flags == -1)
+		throw std::runtime_error("fcntl failed: " + std::string(std::strerror(errno)));
+
+	return (flags);
 }
 
 } // !net

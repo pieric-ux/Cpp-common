@@ -36,7 +36,7 @@ class TcpClient : public ATcpSocket
 	public:
 		TcpClient();
 		explicit TcpClient(int init_fd);
-		TcpClient(int init_domain, int init_protocol);
+		TcpClient(int init_domain, int init_protocol, bool isNonblock = false);
 		~TcpClient();
 		
 		TcpClient(const TcpClient &rhs);

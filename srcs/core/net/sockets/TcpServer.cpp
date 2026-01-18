@@ -45,7 +45,7 @@ TcpServer::TcpServer(int init_fd) : ATcpSocket(init_fd) {}
  * @param init_domain
  * @param init_protocol
  */
-TcpServer::TcpServer(int init_domain, int init_protocol) : ATcpSocket(init_domain, init_protocol) {}
+TcpServer::TcpServer(int init_domain, int init_protocol, bool isNonblock) : ATcpSocket(init_domain, init_protocol, isNonblock) {}
 
 /**
  * @brief 

@@ -43,7 +43,7 @@ class TcpServer : public ATcpSocket
 	public:
 		TcpServer();
 		explicit TcpServer(int init_fd);
-		TcpServer(int init_domain, int init_protocol);
+		TcpServer(int init_domain, int init_protocol, bool isNonblock = false);
 		~TcpServer();
 
 		TcpServer(const TcpServer &rhs);
