@@ -149,6 +149,13 @@ class ASocket : public ISocket
 			int	getFlags() const;
 };
 
+bool	operator==(const ASocket &lhs, const ASocket &rhs);
+bool	operator!=(const ASocket &lhs, const ASocket &rhs);
+bool	operator<(const ASocket &lhs, const ASocket &rhs);
+bool	operator>(const ASocket &lhs, const ASocket &rhs);
+bool	operator<=(const ASocket &lhs, const ASocket &rhs);
+bool	operator>=(const ASocket &lhs, const ASocket &rhs);
+
 } // !net
 } // !core
 } // !common

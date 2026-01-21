@@ -223,6 +223,78 @@ int	ASocket::getFlags() const
 	return (flags);
 }
 
+/**
+ * @brief 
+ *
+ * @param lhs
+ * @param rhs
+ * @return
+ */
+bool	operator==(const ASocket &lhs, const ASocket &rhs)
+{
+	return (lhs.getFd() == rhs.getFd());
+}
+
+/**
+ * @brief 
+ *
+ * @param lhs
+ * @param rhs
+ * @return
+ */
+bool	operator!=(const ASocket &lhs, const ASocket &rhs)
+{
+	return (!(lhs == rhs));
+}
+
+/**
+ * @brief 
+ *
+ * @param lhs
+ * @param rhs
+ * @return
+ */
+bool	operator<(const ASocket &lhs, const ASocket &rhs)
+{
+	return (lhs.getFd() < rhs.getFd());
+}
+
+/**
+ * @brief 
+ *
+ * @param lhs
+ * @param rhs
+ * @return
+ */
+bool	operator>(const ASocket &lhs, const ASocket &rhs)
+{
+	return (rhs < lhs);
+}
+
+/**
+ * @brief 
+ *
+ * @param lhs
+ * @param rhs
+ * @return
+ */
+bool	operator<=(const ASocket &lhs, const ASocket &rhs)
+{
+	return (!(lhs > rhs));
+}
+
+/**
+ * @brief 
+ *
+ * @param lhs
+ * @param rhs
+ * @return
+ */
+bool	operator>=(const ASocket &lhs, const ASocket &rhs)
+{
+	return (!(lhs < rhs));
+}
+
 } // !net
 } // !core
 } // !common
