@@ -1,4 +1,3 @@
-#TODO: Don't forget to add 42 header !
 
 OS = $(shell uname)
 

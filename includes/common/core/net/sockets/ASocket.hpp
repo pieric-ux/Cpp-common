@@ -96,7 +96,7 @@ class ASocket : public ISocket
 		 * @return
 		 */
 		template<typename T>
-		T	getsockopt(int optname, int level = SOL_SOCKET)
+		T	getsockopt(int optname, int level = SOL_SOCKET) const
 		{
 			T optval = {};
 			socklen_t len = sizeof(T);
@@ -145,8 +145,8 @@ class ASocket : public ISocket
 		common::core::raii::UniquePtr<SocketFdRAII> _fd;
 		bool										_isNonblock;
 
-		private:
-			int	getFlags() const;
+	private:
+		int	getFlags() const;
 };
 
 bool	operator==(const ASocket &lhs, const ASocket &rhs);
@@ -166,7 +166,7 @@ bool	operator>=(const ASocket &lhs, const ASocket &rhs);
 /*                                                                            */
 /*                                MIT License                                 */
 /*                                                                            */
-/*   Copyright (c) 2025 Demont Pieric, Lucken Bénédict                        */
+/*   Copyright (c) 2026 Demont Pieric, Lucken Bénédict                        */
 /*                                                                            */
 /*   Permission is hereby granted, free of charge, to any person obtaining    */
 /*   a copy of this software and associated documentation files (the          */

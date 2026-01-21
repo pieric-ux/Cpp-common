@@ -113,7 +113,7 @@ ssize_t ATcpSocket::send(const void *buffer, std::size_t length, int flags)
 /*                                                                            */
 /*                                MIT License                                 */
 /*                                                                            */
-/*   Copyright (c) 2025 Demont Pieric, Lucken Bénédict                        */
+/*   Copyright (c) 2026 Demont Pieric, Lucken Bénédict                        */
 /*                                                                            */
 /*   Permission is hereby granted, free of charge, to any person obtaining    */
 /*   a copy of this software and associated documentation files (the          */

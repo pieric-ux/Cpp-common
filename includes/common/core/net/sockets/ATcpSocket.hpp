@@ -42,8 +42,8 @@ class ATcpSocket : public ASocket
 		ATcpSocket(const ATcpSocket &rhs);
 		ATcpSocket &operator=(const ATcpSocket &rhs);
 
-		ssize_t recv(void *buffer, std::size_t length, int flags = 0);
-		ssize_t send(const void *buffer, std::size_t length, int flags = 0);
+		ssize_t recv(void *buffer, std::size_t length, int flags = 0) const;
+		ssize_t send(const void *buffer, std::size_t length, int flags = 0) const;
 };
 
 } // !net
@@ -56,7 +56,7 @@ class ATcpSocket : public ASocket
 /*                                                                            */
 /*                                MIT License                                 */
 /*                                                                            */
-/*   Copyright (c) 2025 Demont Pieric, Lucken Bénédict                        */
+/*   Copyright (c) 2026 Demont Pieric, Lucken Bénédict                        */
 /*                                                                            */
 /*   Permission is hereby granted, free of charge, to any person obtaining    */
 /*   a copy of this software and associated documentation files (the          */
