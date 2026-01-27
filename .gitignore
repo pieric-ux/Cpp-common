@@ -50,3 +50,7 @@
 
 # Compilation database for tooling
 compile_commands.json
+
+# Docs
+doc/html/
+*.dot
