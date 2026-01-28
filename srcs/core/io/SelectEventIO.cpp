@@ -129,6 +129,20 @@ void SelectEventIO::clear()
 /**
  * @brief [TODO:description]
  *
+ * @param fd [TODO:parameter]
+ * @return [TODO:return]
+ */
+IEventIO::e_Event SelectEventIO::getEvents(int fd) const
+{
+	std::map<int, e_Event>::const_iterator it = _set.find(fd);
+	if (it == _set.end())
+		return (E_NONE);
+	return (it->second);
+}
+
+/**
+ * @brief [TODO:description]
+ *
  * @param sets [TODO:parameter]
  */
 void SelectEventIO::initSets(Sets &sets) const

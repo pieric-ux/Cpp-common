@@ -34,6 +34,7 @@ class IEventIO
 	public:
 		enum e_Event
 		{
+			E_NONE = 0,
 			E_IN = 1 << 0,
 			E_OUT = 1 << 1,
 			E_EXCEPT = 1 << 2,
@@ -46,6 +47,8 @@ class IEventIO
 		virtual void remove(int fd) = 0;
 		virtual void update(int fd, e_Event mask) = 0;
 		virtual void clear() = 0;
+
+		virtual e_Event getEvents(int fd) const = 0;
 };
 
 } // !io

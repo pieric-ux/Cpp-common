@@ -45,6 +45,8 @@ class SelectEventIO : public IEventIO
 		void	remove(int fd);
 		void	update(int fd, e_Event mask);
 		void	clear();
+		
+		e_Event getEvents(int fd) const;
 
 	private:
 		struct Sets
