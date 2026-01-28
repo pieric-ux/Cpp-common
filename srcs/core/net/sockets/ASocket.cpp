@@ -98,7 +98,7 @@ ASocket::ASocket(int domain, int type, int protocol, bool isNonblock) : _fd(new 
 {
 	int fd = ::socket(domain, type, protocol);
 	if (fd == -1)
-		throw std::runtime_error("socket failed: " + std::string(strerror(errno)));
+		throw std::runtime_error("socket failed: " + std::string(std::strerror(errno)));
 	_fd->set(fd);
 
 	if (isNonblock)
