@@ -81,7 +81,7 @@ ATcpSocket &ATcpSocket::operator=(const ATcpSocket &rhs)
  * @param flags 
  * @return
  */
-ssize_t	ATcpSocket::recv(void *buffer, std::size_t length, int flags)
+ssize_t	ATcpSocket::recv(void *buffer, std::size_t length, int flags) const
 {
 	ssize_t rd;
 	if ((rd = ::recv(_fd->get(), buffer, length, flags)) == -1)
@@ -97,7 +97,7 @@ ssize_t	ATcpSocket::recv(void *buffer, std::size_t length, int flags)
  * @param flags
  * @return
  */
-ssize_t ATcpSocket::send(const void *buffer, std::size_t length, int flags)
+ssize_t ATcpSocket::send(const void *buffer, std::size_t length, int flags) const
 {
 	ssize_t rd;
 	if ((rd = ::send(_fd->get(), buffer, length, flags)) == -1)
