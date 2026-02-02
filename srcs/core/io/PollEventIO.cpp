@@ -6,7 +6,7 @@
 /*   By: blucken <blucken@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/02 17:25:13 by blucken          ###   ########.fr       */
+/*   Updated: 2026/02/02 23:18:23 by blucken          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,6 +159,7 @@ IEventIO::e_Event PollEventIO::getEvents(int fd) const
 
  * @param event [TODO:parameter]
  * @return [TODO:return]
+ */
 
 short PollEventIO::eventToMask(e_Event event) const
 {
