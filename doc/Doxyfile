@@ -42,6 +42,7 @@ HIDE_UNDOC_CLASSES     = NO
 SORT_MEMBER_DOCS       = YES
 SORT_BRIEF_DOCS        = NO
 SORT_BY_SCOPE_NAME     = NO
+GENERATE_LEGEND        = YES
 
 #---------------------------------------------------------------------------
 # Configuration options related to warning and progress messages
@@ -57,7 +58,7 @@ WARN_NO_PARAMDOC       = NO
 # Configuration options related to the input files
 #---------------------------------------------------------------------------
 
-INPUT                  = includes srcs README.md
+INPUT                  = includes srcs README.md doc/dox/uml_diagrams.dox
 RECURSIVE              = YES
 FILE_PATTERNS          = *.hpp *.h *.cpp *.md
 EXCLUDE_PATTERNS       = */objs/*
@@ -87,14 +88,17 @@ MACRO_EXPANSION        = NO
 GENERATE_TAGFILE       = doc/html/Cpp-common.tag
 
 #---------------------------------------------------------------------------
+# Configuration options related to PlantUML
+#---------------------------------------------------------------------------
+
+PLANTUML_JAR_PATH      = $(HOMEBREW_CELLAR)/plantuml/1.2026.1/libexec/plantuml.jar
+
+#---------------------------------------------------------------------------
 # Configuration options related to the documentation format
 #---------------------------------------------------------------------------
 
 JAVADOC_AUTOBRIEF      = YES
 MULTILINE_CPP_IS_BRIEF = YES
-MARKDOWN_SUPPORT       = YES
-USE_MDFILE_AS_MAINPAGE = README.md
-
 MARKDOWN_SUPPORT       = YES
 USE_MDFILE_AS_MAINPAGE = README.md
 
@@ -109,6 +113,7 @@ HTML_COLORSTYLE        = AUTO_LIGHT
 HTML_DYNAMIC_SECTIONS  = YES
 GENERATE_TREEVIEW      = YES
 TREEVIEW_WIDTH         = 250
+IMAGE_PATH             = doc
 
 #---------------------------------------------------------------------------
 # Configuration options related to the LaTeX output
@@ -134,7 +139,7 @@ COLLABORATION_GRAPH    = YES
 GROUP_GRAPHS           = YES
 UML_LOOK               = YES
 UML_LIMIT_NUM_FIELDS   = 10
-DOT_UML_DETAILS        = NO
+DOT_UML_DETAILS        = YES
 DOT_WRAP_THRESHOLD     = 17
 TEMPLATE_RELATIONS     = YES
 INCLUDE_GRAPH          = YES
@@ -147,6 +152,6 @@ DIR_GRAPH_MAX_DEPTH    = 1
 DOT_IMAGE_FORMAT       = svg
 INTERACTIVE_SVG        = YES
 DOT_TRANSPARENT        = YES
-DOT_GRAPH_MAX_NODES    = 200
+DOT_GRAPH_MAX_NODES    = 500
 MAX_DOT_GRAPH_DEPTH    = 0
 DOT_MULTI_TARGETS      = YES

@@ -81,4 +81,20 @@ fclean: clean
 # Rule to recompile everything
 re: fclean all
 
-.PHONY: all clean fclean re bonus debug sanitize
+# Rule to generate documentation with Doxygen
+doc:
+	@echo "Generating documentation with Doxygen..."
+	@doxygen doc/Doxyfile
+	@echo "Documentation generated in doc/html/"
+
+# Rule to open documentation in browser
+opendoc:
+	@open doc/html/index.html
+
+# Rule to clean documentation
+cleandoc:
+	@echo "Cleaning documentation..."
+	@rm -rf doc/html doc/latex doc/html/Log42.tag
+	@echo "Documentation cleaned."
+
+.PHONY: all clean fclean re bonus debug sanitize doc opendoc cleandoc
