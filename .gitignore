@@ -54,3 +54,7 @@ compile_commands.json
 # Docs
 doc/html/
 *.dot
+
+# Tests
+testPoll
+/objs_test/

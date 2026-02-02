@@ -70,9 +70,15 @@ $(OBJDIR)/%.o: %.cpp
 $(NAME): $(OBJS_SRCES)
 	ar -rcs $(NAME) $(OBJS_SRCES)
 
+# Compile testPoll.cpp
+$(TEST_POLL_OBJ): $(TEST_POLL_SRC)
+	@mkdir -p $(OBJDIR)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+
 # Rule to clean up object files
 clean:
 	@rm -rf $(OBJDIR)
+	@rm -f $(TEST_POLL)
 
 # Rule to clean up object files and executable
 fclean: clean
@@ -81,4 +87,4 @@ fclean: clean
 # Rule to recompile everything
 re: fclean all
 
-.PHONY: all clean fclean re bonus debug sanitize
+.PHONY: all clean fclean re bonus debug sanitize testpoll

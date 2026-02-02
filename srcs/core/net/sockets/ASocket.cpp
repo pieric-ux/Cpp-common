@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ASocket.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
-/*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
-/*                                                     #+#    #+#             */
-/*   Created: 2026/01/12                              ###   ########.fr       */
+/*   By: blucken <blucken@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: Invalid date        by                   #+#    #+#             */
+/*   Updated: 2026/02/02 17:23:54 by blucken          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,7 @@ ASocket::~ASocket() {}
 
 
 /**
- * @brief
+ * @brief FIXME: on devrait pas dup le fd?
  *
  * @param rhs
  */

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   SelectEventIO.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
-/*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
-/*                                                     #+#    #+#             */
-/*   Created: 2026/01/26                              ###   ########.fr       */
+/*   By: blucken <blucken@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: Invalid date        by                   #+#    #+#             */
+/*   Updated: 2026/02/02 17:13:43 by blucken          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include <common/core/io/SelectEventIO.hpp>
 #include <common/core/utils/stringUtils.hpp>
 #include <cstring>
+#include <cerrno>
 #include <map>
 #include <stdexcept>
 #include <utility>
@@ -68,7 +69,7 @@ int	SelectEventIO::wait(int timeout_ms)
 	if ((ready = ::select(_nfds, &sets._readfds, &sets._writefds, &sets._exceptfds, &tv)) == -1)
 		throw std::runtime_error("select failed: " + std::string(std::strerror(errno)));
 	if (ready)
-		updateSets(sets);
+		updateSets(sets); // FIXME: on appelle clear() pour update mais on perd tout ce quon a add?  
 	return (ready);
 }
 
