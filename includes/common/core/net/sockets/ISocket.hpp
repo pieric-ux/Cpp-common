@@ -30,6 +30,15 @@ namespace net
 /**
  * @class ISocket
  * @brief 
+ *
+ * @startuml
+ * interface "ISocket" as ISocket {
+		+ bind(addr : sockaddr, addrlen : socklen_t) : void
+		+ close() : void
+		+ getFd() : int
+		+ shutdown(how : int) : void
+	}
+ * @enduml
  */
 class ISocket
 {

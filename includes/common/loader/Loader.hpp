@@ -32,6 +32,16 @@ namespace loader
  *
  * The Loader class provides methods to iterate over files in a directory with a specific extension,
  * and to apply a user-provided parser function to each file.
+ *
+ * @startuml
+ * class "Loader" as Loader {
+		+ <<typedef>> fileParser
+		--
+		+ Loader()
+		+ loadDirectory(dirname : string, extension : string, parser : fileParser) : void
+		- loadFile(filename : string, parser : fileParser) : void
+	}
+ * @enduml
  */
 class Loader
 {

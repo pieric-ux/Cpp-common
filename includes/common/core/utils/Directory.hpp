@@ -35,6 +35,18 @@ class DirectoryIterator;
  * @brief RAII wrapper for directory operations.
  *
  * Provides methods to open, iterate, and create directories using POSIX APIs.
+ *
+ * @startuml
+ * class "Directory" as Directory {
+		- dir : DIR*
+		--
+		+ Directory(filename : string)
+		+ begin() : DirectoryIterator
+		+ end() : DirectoryIterator
+		+ getDir() : DIR*
+		+ {static} create(filename : string) : void
+	}
+ * @enduml
  */
 class Directory
 {
@@ -61,6 +73,20 @@ class Directory
  * @brief Iterator for traversing directory entries.
  *
  * Provides standard iterator operations for iterating over directory entries.
+ *
+ * @startuml
+ * class "DirectoryIterator" as DirectoryIterator {
+		- dir : Directory*
+		- entry : dirent*
+		--
+		+ DirectoryIterator()
+		+ DirectoryIterator(dir : Directory*)
+		+ operator*() : dirent*
+		+ operator++() : DirectoryIterator&
+		+ operator++(int) : DirectoryIterator
+		+ operator!=(rhs : DirectoryIterator) : bool
+	}
+ * @enduml
  */
 class DirectoryIterator
 {

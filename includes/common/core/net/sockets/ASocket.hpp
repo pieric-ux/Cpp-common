@@ -36,6 +36,29 @@ namespace net
 /**
  * @class ASocket
  * @brief 
+ *
+ * @startuml
+ * abstract class "ASocket" as ASocket {
+		# _fd : SocketFdRAII
+		# _isNonblock : bool
+		--
+		+ ASocket()
+		+ ASocket(init_fd : int)
+		+ ASocket(domain : int, type : int, protocol : int, isNonblock : bool)
+		+ bind(addr : sockaddr, addrlen : socklen_t) : void
+		+ close() : void
+		+ getFd() : int
+		+ getIsNonblock() : bool
+		+ setIsNonblock(isNonblock : bool) : void
+		+ shutdown(how : int) : void
+		- getFlags() : int
+		--
+		+ <<template>> getsockname<T>() : T
+		+ <<template>> getpeername<T>() : T
+		+ <<template>> getsockopt<T>(optname : int, level : int) : T
+		+ <<template>> setsockopt<T>(optname : int, optval : T, level : int) : void
+	}
+ * @enduml
  */
 class ASocket : public ISocket
 {
@@ -125,6 +148,15 @@ class ASocket : public ISocket
 		 * @class SocketFdRAII
 		 * @brief 
 		 *
+		 * @startuml
+		 * class "SocketFdRAII" as SocketFdRAII {
+				- _fdRef : int
+				--
+				+ SocketFdRAII(init_fd : int)
+				+ getFd() : int
+				+ setFd(new_fd : int) : void
+			}
+		 * @enduml
 		 */
 		class SocketFdRAII
 		{

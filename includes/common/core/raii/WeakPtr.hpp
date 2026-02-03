@@ -186,6 +186,19 @@ SharedPtr<T> WeakPtr<T>::lock() const throw()
  * Decrements `weak_count` and deletes the control block if both
  * `weak_count` and `count` reach zero. This is a private implementation
  * detail used by the destructor, assignment operator and reset().
+ *
+ * @startuml
+ * class "WeakPtr<T>" as WeakPtrT <<template>> {
+		- _cb : SharedPtrControlBlock
+		--
+		- release() : void
+		+ WeakPtr(sp : SharedPtr<T>)
+		+ reset() : void
+		+ swap(other : WeakPtr<T>) : void
+		+ expired() : bool
+		+ lock() : SharedPtr<T>
+	}
+ * @enduml
  */
 template<typename T>
 void WeakPtr<T>::release() throw()

@@ -30,6 +30,16 @@ namespace net
 /**
  * @class TcpClient
  * @brief 
+ *
+ * @startuml
+ * class "TcpClient" as TcpClient {
+		--
+		+ TcpClient()
+		+ TcpClient(init_fd : int)
+		+ TcpClient(init_domain : int, init_protocol : int, isNonblock : bool)
+		+ connect(addr : sockaddr, addrlen : socklen_t) : void
+	}
+ * @enduml
  */
 class TcpClient : public ATcpSocket
 {

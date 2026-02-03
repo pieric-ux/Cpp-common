@@ -53,6 +53,20 @@ namespace raii
  *
  * @tparam T Type of the managed object.
  * @tparam Deleter Type of the deleter functor.
+ *
+ * @startuml
+ * class "UniquePtrBase<T, Deleter>" as UniquePtrBaseT <<template>> {
+		# _ptr : T*
+		# _deleter : Deleter
+		--
+		# UniquePtrBase(ptr : T*, deleter : Deleter)
+		+ release() : T*
+		+ reset(ptr : T*) : void
+		+ swap(other : UniquePtrBase<T, Deleter>) : void
+		+ get() : T*
+		+ getDeleter() : Deleter&
+	}
+ * @enduml
  */
 template<typename T, typename Deleter>
 class UniquePtrBase
@@ -86,6 +100,14 @@ class UniquePtrBase
  *
  * @tparam T Type of the managed object.
  * @tparam Deleter Type of the deleter functor (default: DefaultDelete<T>).
+ *
+ * @startuml
+ * class "UniquePtr<T, Deleter>" as UniquePtrT <<template>> {
+		+ UniquePtr(ptr : T*, deleter : Deleter)
+		+ operator->() : T*
+		+ operator*() : T&
+	}
+ * @enduml
  */
 template<typename T, typename Deleter = DefaultDelete<T> >
 class UniquePtr : public UniquePtrBase<T, Deleter>
@@ -112,6 +134,13 @@ class UniquePtr : public UniquePtrBase<T, Deleter>
  *
  * @tparam T Type of the managed array elements.
  * @tparam Deleter Type of the deleter functor.
+ *
+ * @startuml
+ * class "UniquePtr<T[], Deleter>" as UniquePtrArray <<template>> [[classcommon_1_1core_1_1raii_1_1_unique_ptr_3_01_t_0f_0e_00_01_deleter_01_4.html]]{
+		+ UniquePtr(ptr : T*, deleter : Deleter)
+		+ operator[](i : int) : T&
+	}
+ * @enduml
  */
 template<typename T, typename Deleter>
 class UniquePtr<T[], Deleter> : public UniquePtrBase<T, Deleter>

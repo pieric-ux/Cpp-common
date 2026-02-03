@@ -28,10 +28,33 @@ namespace io
 /**
  * @class IEventIO
  * @brief [TODO:description]
+ *
+ * @startuml
+ * interface "IEventIO" as IEventIO {
+		+ wait(timeout_ms : int) : int
+		+ add(fd : int, mask : e_Event) : void
+		+ remove(fd : int) : void
+		+ update(fd : int, mask : e_Event) : void
+		+ clear() : void
+		+ getEvents(fd : int) : e_Event
+	}
+ * @enduml
  */
 class IEventIO
 {
 	public:
+		/**
+		 * @brief [TODO:description]
+		 *
+		 * @startuml
+		 * enum "e_Event" as e_Event {
+				E_NONE
+				E_IN
+				E_OUT
+				E_EXCEPT
+			}
+		 * @enduml
+		 */
 		enum e_Event
 		{
 			E_NONE = 0,

@@ -30,6 +30,17 @@ namespace net
 /**
  * @class ATcpSocket
  * @brief 
+ *
+ * @startuml
+ * abstract class "ATcpSocket" as ATcpSocket {
+		--
+		+ ATcpSocket()
+		+ ATcpSocket(init_fd : int)
+		+ ATcpSocket(init_domain : int, init_protocol : int, isNonblock : bool)
+		+ recv(buffer : void*, length : int, flags : int) : int
+		+ send(buffer : const void*, length : int, flags : int) : int
+	}
+ * @enduml
  */
 class ATcpSocket : public ASocket
 {
