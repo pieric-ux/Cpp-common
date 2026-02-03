@@ -98,16 +98,16 @@ namespace common.core.net {
 		+ shutdown(how : int) : void
 	}
 
-	class "SocketFdRAII" as SocketFdRAII [[classcommon_1_1core_1_1net_1_1_socket_fd_ra_i_i.html]] {
+	class "SocketFdRAII" as SocketFdRAII [[classcommon_1_1core_1_1net_1_1_a_socket_1_1_socket_fd_r_a_i_i.html]] {
 		- _fdRef : int
 		--
-		+ SocketFdRaII(init_fd : int)
+		+ SocketFdRAII(init_fd : int)
 		+ getFd() : int
 		+ setFd(new_fd : int) : void
 	}
 
 	abstract class "ASocket" as ASocket [[classcommon_1_1core_1_1net_1_1_a_socket.html]] {
-		# _fd : SocketFdRaII
+		# _fd : SocketFdRAII
 		# _isNonblock : bool
 		--
 		+ ASocket()
@@ -163,26 +163,26 @@ namespace common.core.net {
 }
 
 namespace common.core.raii {
-	interface "IDeleter" as IDeleter [[classcommon_1_1core_1_1raii_1_1_i_deleter.html]] {
+	interface "IDeleter" as IDeleter [[structcommon_1_1core_1_1raii_1_1_i_deleter.html]] {
 		+ destroy(ptr : void*) : void
 	}
 
-	class "DefaultDelete<T>" as DefaultDeleteT <<template>> {
-		+ destroy(ptr : void*) : void
-		+ operator()(ptr : T*) : void
-	}
-
-	class "DefaultDelete<T[]>" as DefaultDeleteArray <<template>> {
+	class "DefaultDelete<T>" as DefaultDeleteT <<template>> [[structcommon_1_1core_1_1raii_1_1_default_delete.html]]{
 		+ destroy(ptr : void*) : void
 		+ operator()(ptr : T*) : void
 	}
 
-	class "AddrinfoDeleter" as AddrinfoDeleter {
+	class "DefaultDelete<T[]>" as DefaultDeleteArray <<template>> [[structcommon_1_1core_1_1raii_1_1_default_delete_3_01_t_0f_0e_4.html]]{
+		+ destroy(ptr : void*) : void
+		+ operator()(ptr : T*) : void
+	}
+
+	class "AddrinfoDeleter" as AddrinfoDeleter [[structcommon_1_1core_1_1raii_1_1_addrinfo_deleter.html]] {
 		+ destroy(ptr : void*) : void
 		+ operator()(ptr : addrinfo) : void
 	}
 
-	struct "SharedPtrControlBlock" as SharedPtrControlBlock {
+	struct "SharedPtrControlBlock" as SharedPtrControlBlock [[structcommon_1_1core_1_1raii_1_1_shared_ptr_control_block.html]] {
 		ptr : void*
 		deleter : IDeleter*
 		count : int
@@ -191,7 +191,7 @@ namespace common.core.raii {
 		SharedPtrControlBlock(p : void*, d : IDeleter*)
 	}
 
-	class "SharedPtrBase" as SharedPtrBase {
+	class "SharedPtrBase" as SharedPtrBase [[classcommon_1_1core_1_1raii_1_1_shared_ptr_base.html]] {
 		# _cb : SharedPtrControlBlock
 		--
 		# SharedPtrBase(ptr : void*, deleter : IDeleter*)
@@ -202,19 +202,19 @@ namespace common.core.raii {
 		+ operator bool() : bool
 	}
 
-	class "SharedPtr<T>" as SharedPtrT <<template>> {
+	class "SharedPtr<T>" as SharedPtrT <<template>> [[classcommon_1_1core_1_1raii_1_1_shared_ptr.html]] {
 		+ SharedPtr(ptr : T*)
 		+ get() : T*
 		+ operator->() : T*
 		+ operator*() : T&
 	}
 
-	class "SharedPtr<T[]>" as SharedPtrArray <<template>> {
+	class "SharedPtr<T[]>" as SharedPtrArray <<template>> [[classcommon_1_1core_1_1raii_1_1_shared_ptr_3_01_t_0f_0e_4.html]] {
 		+ SharedPtr(ptr : T*)
 		+ operator[](i : int) : T&
 	}
 
-	class "UniquePtrBase<T, Deleter>" as UniquePtrBaseT <<template>> {
+	class "UniquePtrBase<T, Deleter>" as UniquePtrBaseT <<template>> [[classcommon_1_1core_1_1raii_1_1_unique_ptr_base.html]] {
 		# _ptr : T*
 		# _deleter : Deleter
 		--
@@ -226,18 +226,18 @@ namespace common.core.raii {
 		+ getDeleter() : Deleter&
 	}
 
-	class "UniquePtr<T, Deleter>" as UniquePtrT <<template>> {
+	class "UniquePtr<T, Deleter>" as UniquePtrT <<template>> [[classcommon_1_1core_1_1raii_1_1_unique_ptr.html]] {
 		+ UniquePtr(ptr : T*, deleter : Deleter)
 		+ operator->() : T*
 		+ operator*() : T&
 	}
 
-	class "UniquePtr<T[], Deleter>" as UniquePtrArray <<template>> {
+	class "UniquePtr<T[], Deleter>" as UniquePtrArray <<template>> [[classcommon_1_1core_1_1raii_1_1_unique_ptr_3_01_t_0f_0e_00_01_deleter_01_4.html]]{
 		+ UniquePtr(ptr : T*, deleter : Deleter)
 		+ operator[](i : int) : T&
 	}
 
-	class "WeakPtr<T>" as WeakPtrT <<template>> {
+	class "WeakPtr<T>" as WeakPtrT <<template>> [[classcommon_1_1core_1_1raii_1_1_weak_ptr.html]]{
 		- _cb : SharedPtrControlBlock
 		--
 		- release() : void
@@ -260,7 +260,7 @@ namespace common.core.raii {
 }
 
 namespace common.core.utils {
-	class "Directory" as Directory {
+	class "Directory" as Directory [[classcommon_1_1core_1_1utils_1_1_directory.html]] {
 		- dir : DIR*
 		--
 		+ Directory(filename : string)
@@ -270,7 +270,7 @@ namespace common.core.utils {
 		+ {static} create(filename : string) : void
 	}
 
-	class "DirectoryIterator" as DirectoryIterator {
+	class "DirectoryIterator" as DirectoryIterator [[classcommon_1_1core_1_1utils_1_1_directory_iterator.html]] {
 		- dir : Directory*
 		- entry : dirent*
 		--
@@ -286,12 +286,11 @@ namespace common.core.utils {
 }
 
 namespace common.loader {
-	class "Loader" as Loader {
+	class "Loader" as Loader [[classcommon_1_1loader_1_1_loader.html]] {
 		+ <<typedef>> fileParser
 		--
 		+ Loader()
 		+ loadDirectory(dirname : string, extension : string, parser : fileParser) : void
-		--
 		- loadFile(filename : string, parser : fileParser) : void
 	}
 }

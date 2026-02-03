@@ -34,6 +34,15 @@ namespace net
  * @class Addrinfo
  * @brief 
  *
+ * @startuml
+ * class "Addrinfo" as Addrinfo {
+		-  _res : addrinfo
+		--
+		+ Addrinfo()
+		+ Addrinfo(hostname : string, servname : string, ai_flags : int, ai_family : int, ai_socktype : int, ai_protocol : int)
+		+ getRes() : addrinfo
+	}
+ * @enduml
  */
 class Addrinfo
 {

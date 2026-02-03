@@ -37,6 +37,18 @@ namespace net
 /**
  * @class TcpServer
  * @brief 
+ *
+ * @startuml
+ * class "TcpServer" as TcpServer {
+		--
+		+ TcpServer()
+		+ TcpServer(init_fd : int)
+		+ TcpServer(init_domain : int, init_protocol : int, isNonblock : bool)
+		+ listen(backlog : int) : void
+		--
+		+ <<template>> accept<T>() : pair<TcpClient, T>
+	}
+ * @enduml
  */
 class TcpServer : public ATcpSocket
 {

@@ -34,6 +34,17 @@ namespace raii
  * @brief Internal control block for SharedPtr reference counting.
  *
  * Holds the managed pointer, deleter, and reference count.
+ *
+ * @startuml
+ * struct "SharedPtrControlBlock" as SharedPtrControlBlock {
+		ptr : void*
+		deleter : IDeleter*
+		count : int
+		weak_count : int
+		--
+		SharedPtrControlBlock(p : void*, d : IDeleter*)
+	}
+ * @enduml
  */
 struct SharedPtrControlBlock 
 {
@@ -68,6 +79,19 @@ template<typename T> class SharedPtr;
  * @brief Base class for reference-counted shared ownership smart pointers.
  *
  * Manages a pointer, a deleter, and a reference count for shared ownership.
+ *
+ * @startuml
+ * class "SharedPtrBase" as SharedPtrBase {
+		# _cb : SharedPtrControlBlock
+		--
+		# SharedPtrBase(ptr : void*, deleter : IDeleter*)
+		# reset(ptr : void*) : void
+		# swap(other : SharedPtrBase) : void
+		+ useCount() : int
+		+ unique() : bool
+		+ operator bool() : bool
+	}
+ * @enduml
  */
 class SharedPtrBase
 {
@@ -114,6 +138,15 @@ class SharedPtrBase
  * Provides shared ownership semantics for a dynamically allocated object.
  *
  * @tparam T Type of the managed object.
+ *
+ * @startuml
+ * class "SharedPtr<T>" as SharedPtrT <<template>> {
+		+ SharedPtr(ptr : T*)
+		+ get() : T*
+		+ operator->() : T*
+		+ operator*() : T&
+	}
+ * @enduml
  */
 template<typename T>
 class SharedPtr : public SharedPtrBase
@@ -141,6 +174,13 @@ class SharedPtr : public SharedPtrBase
  * Provides shared ownership semantics for a dynamically allocated array.
  *
  * @tparam T Type of the managed array elements.
+ *
+ * @startuml
+ * class "SharedPtr<T[]>" as SharedPtrArray <<template>> {
+		+ SharedPtr(ptr : T*)
+		+ operator[](i : int) : T&
+	}
+ * @enduml
  */
 template<typename T>
 class SharedPtr<T[]> : public SharedPtrBase

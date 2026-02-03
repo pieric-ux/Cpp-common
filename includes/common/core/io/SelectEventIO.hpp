@@ -33,6 +33,24 @@ namespace io
 /**
  * @class SelectEventIO
  * @brief [TODO:description]
+ *
+ * @startuml
+ * class "SelectEventIO" as SelectEventIO {
+		- _set : map<int, e_Event>
+		- _nfds : int
+		--
+		- initSets(sets : Sets) : void
+		- updateSets(sets : Sets) : void
+		- initTimeout(timeout_ms : int) : timeval
+		+ SelectEventIO()
+		+ wait(timeout_ms : int) : int
+		+ add(fd : int, mask : e_Event) : void
+		+ remove(fd : int) : void
+		+ update(fd : int, mask : e_Event) : void
+		+ clear() : void
+		+ getEvents(fd : int) : e_Event
+	}
+ * @enduml
  */
 class SelectEventIO : public IEventIO
 {
@@ -49,6 +67,20 @@ class SelectEventIO : public IEventIO
 		e_Event getEvents(int fd) const;
 
 	private:
+		/**
+		 * @class Sets
+		 * @brief [TODO:description]
+		 *
+		 * @startuml
+		 * struct "Sets" as Sets {
+				fd_set read_fds
+				fd_set write_fds
+				fd_set except_fds
+				--
+				Sets()
+			}
+		 * @enduml
+		 */
 		struct Sets
 		{
 			fd_set _readfds;

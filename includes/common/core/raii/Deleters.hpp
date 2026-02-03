@@ -33,6 +33,12 @@ namespace raii
  * Provides a virtual destructor and a pure virtual destroy method
  * for deleting objects via a void pointer. Intended for use with
  * smart pointer implementations that require custom deletion logic.
+ *
+ * @startuml
+ * interface "IDeleter" as IDeleter {
+		+ destroy(ptr : void*) : void
+	}
+ * @enduml
  */
 struct IDeleter
 {
@@ -48,6 +54,13 @@ struct IDeleter
  * Intended for use with smart pointers managing single objects.
  *
  * @tparam T Type of the object to delete.
+ *
+ * @startuml
+ * class "DefaultDelete<T>" as DefaultDeleteT <<template>> {
+		+ destroy(ptr : void*) : void
+		+ operator()(ptr : T*) : void
+	}
+ * @enduml
  */
 template<typename T>
 struct DefaultDelete : public IDeleter
@@ -63,6 +76,13 @@ struct DefaultDelete : public IDeleter
  * Intended for use with smart pointers managing arrays.
  *
  * @tparam T Type of the array elements to delete.
+ *
+ * @startuml
+ * class "DefaultDelete<T[]>" as DefaultDeleteArray <<template>> {
+		+ destroy(ptr : void*) : void
+		+ operator()(ptr : T*) : void
+	}
+ * @enduml
  */
 template<typename T>
 struct DefaultDelete<T[]> : public IDeleter
@@ -77,6 +97,13 @@ struct DefaultDelete<T[]> : public IDeleter
  * Provides custom deletion logic for objects of type struct addrinfo,
  * using freeaddrinfo. Intended for use with smart pointers managing
  * addrinfo pointers returned by getaddrinfo.
+ *
+ * @startuml
+ * class "AddrinfoDeleter" as AddrinfoDeleter {
+		+ destroy(ptr : void*) : void
+		+ operator()(ptr : addrinfo) : void
+	}
+ * @enduml
  */
 struct AddrinfoDeleter : public IDeleter
 {
