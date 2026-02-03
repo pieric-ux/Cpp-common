@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: blucken <blucken@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/02 23:18:23 by blucken          ###   ########.fr       */
+/*   Created: 2026/02/02 23:18:23 by blucken           #+#    #+#             */
+/*   Updated: 2026/02/03 14:27:40 by blucken          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -198,7 +198,7 @@ IEventIO::e_Event PollEventIO::maskToEvent(short mask) const
 /**
  * @brief [TODO:description]
  */
-void PollEventIO::rebuildPollFds()
+void PollEventIO::     rebuildPollFds()
 {
 	_pollfds.clear();
 	std::map<int, e_Event>::const_iterator it;
