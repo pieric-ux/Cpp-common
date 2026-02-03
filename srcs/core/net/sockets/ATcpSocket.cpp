@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: blucken <blucken@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/02 17:22:58 by blucken          ###   ########.fr       */
+/*   Created: 2026/02/03 15:34:11 by blucken           #+#    #+#             */
+/*   Updated: 2026/02/03 15:34:56 by blucken          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ ATcpSocket &ATcpSocket::operator=(const ATcpSocket &rhs)
 ssize_t	ATcpSocket::recv(void *buffer, std::size_t length, int flags) const
 {
 	ssize_t rd;
-	if ((rd = ::recv(_fd->get(), buffer, length, flags)) == -1) //FIXME: EAGAIN ET EWOULDBLOCK doivent pas throw
+	if ((rd = ::recv(_fd->get(), buffer, length, flags)) == -1)
 		throw std::runtime_error("recv failed: " + std::string(std::strerror(errno)));
 	return (rd);
 }

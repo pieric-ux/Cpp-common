@@ -6,7 +6,7 @@
 /*   By: blucken <blucken@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/02 23:18:23 by blucken           #+#    #+#             */
-/*   Updated: 2026/02/03 14:27:40 by blucken          ###   ########.fr       */
+/*   Updated: 2026/02/03 15:57:19 by blucken          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -183,7 +183,7 @@ short PollEventIO::eventToMask(e_Event event) const
  */
 IEventIO::e_Event PollEventIO::maskToEvent(short mask) const
 {
-	e_Event event = static_cast<e_Event>(0);
+	e_Event event = E_NONE;
 	
 	if (mask & POLLIN)
 		event = static_cast<e_Event>(event | E_IN);
@@ -201,6 +201,7 @@ IEventIO::e_Event PollEventIO::maskToEvent(short mask) const
 void PollEventIO::     rebuildPollFds()
 {
 	_pollfds.clear();
+
 	std::map<int, e_Event>::const_iterator it;
 	
 	for (it = _events.begin(); it != _events.end(); ++it)
@@ -220,8 +221,8 @@ void PollEventIO::updateEvents()
 {
 	std::map<int, e_Event>::iterator it;
 
-	for (it = _events.begin(); it != _events.end(); ++it)
-		it->second = E_NONE;
+	// for (it = _events.begin(); it != _events.end(); ++it)
+	// 	it->second = E_NONE;
 	
 	for (size_t i = 0; i < _pollfds.size(); ++i)
 	{

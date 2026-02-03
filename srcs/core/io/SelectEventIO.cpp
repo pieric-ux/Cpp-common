@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: blucken <blucken@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/02 17:13:43 by blucken          ###   ########.fr       */
+/*   Created: 2026/02/03 15:57:19 by blucken           #+#    #+#             */
+/*   Updated: 2026/02/03 15:57:21 by blucken          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ int	SelectEventIO::wait(int timeout_ms)
 	if ((ready = ::select(_nfds, &sets._readfds, &sets._writefds, &sets._exceptfds, &tv)) == -1)
 		throw std::runtime_error("select failed: " + std::string(std::strerror(errno)));
 	if (ready)
-		updateSets(sets); // FIXME: on appelle clear() pour update mais on perd tout ce quon a add?  
+		updateSets(sets);
 	return (ready);
 }
 
@@ -170,7 +170,7 @@ void SelectEventIO::updateSets(Sets &sets)
 	_set.clear();
 	for (int fd = 0; fd < _nfds; ++fd)
 	{
-		e_Event mask = static_cast<e_Event>(0);
+		e_Event mask = E_NONE;
 		if (FD_ISSET(fd, &sets._readfds))
 			mask = static_cast<e_Event>(mask | E_IN);
 		if (FD_ISSET(fd, &sets._writefds))

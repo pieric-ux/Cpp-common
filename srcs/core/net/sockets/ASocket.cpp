@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: blucken <blucken@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/02 17:23:54 by blucken          ###   ########.fr       */
+/*   Created: 2026/02/03 15:43:01 by blucken           #+#    #+#             */
+/*   Updated: 2026/02/03 15:43:29 by blucken          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,7 @@ ASocket::~ASocket() {}
 
 
 /**
- * @brief FIXME: on devrait pas dup le fd?
+ * @brief 
  *
  * @param rhs
  */
