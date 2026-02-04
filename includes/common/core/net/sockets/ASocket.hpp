@@ -15,7 +15,7 @@
 
 /**
  * @file ASocket.hpp
- * @brief 
+ * @brief Abstract base class for socket implementation.
  */
 
 #include <common/core/net/sockets/ISocket.hpp>
@@ -35,7 +35,10 @@ namespace net
 
 /**
  * @class ASocket
- * @brief 
+ * @brief Abstract base implementation for socket operations.
+ *
+ * Provides common socket functionality including initialization, file descriptor
+ * management, and basic socket operations. Implements the ISocket interface.
  *
  * @startuml
  * abstract class "ASocket" as ASocket {
@@ -79,10 +82,11 @@ class ASocket : public ISocket
 		void	shutdown(int how = SHUT_RDWR);
 
 		/**
-		 * @brief 
+		 * @brief Gets the socket address name.
 		 *
-		 * @tparam T
-		 * @return
+		 * @tparam T Address structure type (e.g., sockaddr_in).
+		 * @return Socket address.
+		 * @throw std::runtime_error If getsockname fails.
 		 */
 		template<typename T>
 		T	getsockname() const
@@ -95,10 +99,11 @@ class ASocket : public ISocket
 		}
 
 		/**
-		 * @brief 
+		 * @brief Gets the peer address name.
 		 *
-		 * @tparam T
-		 * @return
+		 * @tparam T Address structure type (e.g., sockaddr_in).
+		 * @return Peer address.
+		 * @throw std::runtime_error If getpeername fails.
 		 */
 		template<typename T>
 		T	getpeername() const
@@ -111,12 +116,13 @@ class ASocket : public ISocket
 		}
 
 		/**
-		 * @brief 
+		 * @brief Gets socket option value.
 		 *
-		 * @tparam T
-		 * @param optname
-		 * @param level
-		 * @return
+		 * @tparam T Option value type.
+		 * @param optname Option name.
+		 * @param level Protocol level (default: SOL_SOCKET).
+		 * @return Option value.
+		 * @throw std::runtime_error If getsockopt fails.
 		 */
 		template<typename T>
 		T	getsockopt(int optname, int level = SOL_SOCKET) const
@@ -129,12 +135,13 @@ class ASocket : public ISocket
 		}
 
 		/**
-		 * @brief 
+		 * @brief Sets socket option value.
 		 *
-		 * @tparam T
-		 * @param optname
-		 * @param optval
-		 * @param level
+		 * @tparam T Option value type.
+		 * @param optname Option name.
+		 * @param optval Option value to set.
+		 * @param level Protocol level (default: SOL_SOCKET).
+		 * @throw std::runtime_error If setsockopt fails.
 		 */
 		template<typename T>
 		void	setsockopt(int optname, const T &optval, int level = SOL_SOCKET)

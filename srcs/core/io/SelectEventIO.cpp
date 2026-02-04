@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   SelectEventIO.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: blucken <blucken@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/02/03 15:57:19 by blucken           #+#    #+#             */
-/*   Updated: 2026/02/03 15:57:21 by blucken          ###   ########.fr       */
+/*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
+/*                                                     #+#    #+#             */
+/*   Created: 2026/01/26                              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 
 /**
  * @file SelectEventIO.cpp
- * @brief 
+ * @brief Implementation of select(2)-based I/O event handler.
  */
 
 namespace common
@@ -34,7 +34,7 @@ namespace io
 {
 
 /**
- * @brief [TODO:description]
+ * @brief Constructor. Initializes all fd_set structures to zero.
  */
 SelectEventIO::Sets::Sets()
 {
@@ -44,19 +44,21 @@ SelectEventIO::Sets::Sets()
 }
 
 /**
- * @brief [TODO:description]
+ * @brief Default constructor. Initializes empty event sets.
  */
 SelectEventIO::SelectEventIO() : _set(), _nfds(0) {}
 
 /**
- * @brief [TODO:description]
+ * @brief Destructor.
  */
 SelectEventIO::~SelectEventIO() {}
 
 /**
- * @brief [TODO:description]
+ * @brief Waits for events on monitored file descriptors.
  *
- * @param timeout_ms [TODO:parameter]
+ * @param timeout_ms Timeout in milliseconds (-1 for infinite, 0 for non-blocking).
+ * @return Number of file descriptors with events, or 0 on timeout.
+ * @throw std::runtime_error If select fails.
  */
 int	SelectEventIO::wait(int timeout_ms)
 {
@@ -74,10 +76,11 @@ int	SelectEventIO::wait(int timeout_ms)
 }
 
 /**
- * @brief [TODO:description]
+ * @brief Adds a file descriptor to monitor for events.
  *
- * @param fd [TODO:parameter]
- * @param mask [TODO:parameter]
+ * @param fd File descriptor to add.
+ * @param mask Event mask to monitor (E_IN, E_OUT, E_EXCEPT).
+ * @throw std::runtime_error If fd exceeds FD_SETSIZE.
  */
 void SelectEventIO::add(int fd, e_Event mask)
 {
@@ -89,9 +92,9 @@ void SelectEventIO::add(int fd, e_Event mask)
 }
 
 /**
- * @brief [TODO:description]
+ * @brief Removes a file descriptor from monitoring.
  *
- * @param fd [TODO:parameter]
+ * @param fd File descriptor to remove.
  */
 void SelectEventIO::remove(int fd)
 {
@@ -106,10 +109,10 @@ void SelectEventIO::remove(int fd)
 }
 
 /**
- * @brief [TODO:description]
+ * @brief Updates the event mask for a monitored file descriptor.
  *
- * @param fd [TODO:parameter]
- * @param mask [TODO:parameter]
+ * @param fd File descriptor to update.
+ * @param mask New event mask.
  */
 void SelectEventIO::update(int fd, e_Event mask)
 {
@@ -119,7 +122,7 @@ void SelectEventIO::update(int fd, e_Event mask)
 }
 
 /**
- * @brief [TODO:description]
+ * @brief Removes all monitored file descriptors.
  */
 void SelectEventIO::clear()
 {
@@ -128,10 +131,10 @@ void SelectEventIO::clear()
 }
 
 /**
- * @brief [TODO:description]
+ * @brief Gets the detected events for a file descriptor.
  *
- * @param fd [TODO:parameter]
- * @return [TODO:return]
+ * @param fd File descriptor to query.
+ * @return Detected event mask (E_NONE if fd not monitored).
  */
 IEventIO::e_Event SelectEventIO::getEvents(int fd) const
 {
@@ -142,9 +145,9 @@ IEventIO::e_Event SelectEventIO::getEvents(int fd) const
 }
 
 /**
- * @brief [TODO:description]
+ * @brief Initializes fd_set structures based on monitored events.
  *
- * @param sets [TODO:parameter]
+ * @param sets Sets structure to populate.
  */
 void SelectEventIO::initSets(Sets &sets) const
 {
@@ -161,9 +164,9 @@ void SelectEventIO::initSets(Sets &sets) const
 }
 
 /**
- * @brief [TODO:description]
+ * @brief Updates monitored events based on select(2) results.
  *
- * @param sets [TODO:parameter]
+ * @param sets Populated Sets structure from select(2).
  */
 void SelectEventIO::updateSets(Sets &sets)
 {
@@ -183,10 +186,10 @@ void SelectEventIO::updateSets(Sets &sets)
 }
 
 /**
- * @brief [TODO:description]
+ * @brief Converts millisecond timeout to timeval structure.
  *
- * @param timeout_ms [TODO:parameter]
- * @return [TODO:return]
+ * @param timeout_ms Timeout in milliseconds.
+ * @return Initialized timeval structure.
  */
 struct timeval SelectEventIO::initTimeout(int timeout_ms)
 {
@@ -201,3 +204,30 @@ struct timeval SelectEventIO::initTimeout(int timeout_ms)
 } // !io
 } // !core
 } // !common
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                MIT License                                 */
+/*                                                                            */
+/*   Copyright (c) 2026 Demont Pieric, Lucken Bénédict                        */
+/*                                                                            */
+/*   Permission is hereby granted, free of charge, to any person obtaining    */
+/*   a copy of this software and associated documentation files (the          */
+/*   "Software"), to deal in the Software without restriction, including      */
+/*   without limitation the rights to use, copy, modify, merge, publish,      */
+/*   distribute, sublicense, and/or sell copies of the Software, and to       */
+/*   permit persons to whom the Software is furnished to do so, subject to    */
+/*   the following conditions:                                                */
+/*                                                                            */
+/*   The above copyright notice and this permission notice shall be included  */
+/*   in all copies or substantial portions of the Software.                   */
+/*                                                                            */
+/*   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  */
+/*   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF               */
+/*   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.   */
+/*   IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY     */
+/*   CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,     */
+/*   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE        */
+/*   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                   */
+/*                                                                            */
+/* ************************************************************************** */

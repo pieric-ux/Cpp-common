@@ -15,7 +15,7 @@
 
 /**
  * @file ATcpSocket.hpp
- * @brief 
+ * @brief Abstract TCP socket implementation.
  */
 
 #include <common/core/net/sockets/ASocket.hpp>
@@ -29,7 +29,10 @@ namespace net
 
 /**
  * @class ATcpSocket
- * @brief 
+ * @brief Abstract base class for TCP socket operations.
+ *
+ * Extends ASocket with TCP-specific operations such as send and receive.
+ * Provides a common interface for both TCP client and server implementations.
  *
  * @startuml
  * abstract class "ATcpSocket" as ATcpSocket {

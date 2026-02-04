@@ -15,7 +15,7 @@
 
 /**
  * @file ISocket.hpp
- * @brief 
+ * @brief Interface for socket operations.
  */
 
 #include <sys/socket.h>
@@ -29,7 +29,10 @@ namespace net
 
 /**
  * @class ISocket
- * @brief 
+ * @brief Abstract base class defining socket interface.
+ *
+ * This interface defines the common operations that all socket implementations
+ * must provide, such as binding, closing, and shutdown operations.
  *
  * @startuml
  * interface "ISocket" as ISocket {

@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   ASocket.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: blucken <blucken@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/02/03 15:43:01 by blucken           #+#    #+#             */
-/*   Updated: 2026/02/03 15:43:29 by blucken          ###   ########.fr       */
+/*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
+/*                                                     #+#    #+#             */
+/*   Created: 2026/01/15                              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 /**
- * @file
- * @brief 
+ * @file ASocket.cpp
+ * @brief Implementation of abstract socket base class.
  */
 
 #include <common/core/net/sockets/ASocket.hpp>
@@ -32,14 +32,16 @@ namespace net
 {
 
 /**
- * @brief 
+ * @brief RAII wrapper for socket file descriptor.
  *
- * @param init_fdRef
+ * Manages the lifecycle of a socket file descriptor with automatic cleanup.
+ *
+ * @param init_fd Initial socket file descriptor.
  */
 ASocket::SocketFdRAII::SocketFdRAII(int init_fd) : _fdRef(init_fd) {}
 
 /**
- * @brief 
+ * @brief Destructor. Closes the socket file descriptor if it's valid.
  */
 ASocket::SocketFdRAII::~SocketFdRAII()
 {
@@ -51,9 +53,9 @@ ASocket::SocketFdRAII::~SocketFdRAII()
 }
 
 /**
- * @brief 
+ * @brief Gets the socket file descriptor.
  *
- * @return
+ * @return The file descriptor value, or -1 if invalid.
  */
 int	ASocket::SocketFdRAII::get() const
 {
@@ -61,9 +63,9 @@ int	ASocket::SocketFdRAII::get() const
 }
 
 /**
- * @brief 
+ * @brief Sets a new socket file descriptor.
  *
- * @param fd
+ * @param new_fd The new file descriptor to store.
  */
 void	ASocket::SocketFdRAII::set(int new_fd)
 {
@@ -71,14 +73,14 @@ void	ASocket::SocketFdRAII::set(int new_fd)
 }
 
 /**
- * @brief 
+ * @brief Default constructor. Creates an invalid socket.
  */
 ASocket::ASocket() : _fd(new SocketFdRAII(-1)), _isNonblock(false) {}
 
 /**
- * @brief 
+ * @brief Constructor from an existing file descriptor.
  *
- * @param init_fd
+ * @param init_fd Existing socket file descriptor to manage.
  */
 ASocket::ASocket(int init_fd) : _fd(new SocketFdRAII(init_fd))
 {
@@ -88,11 +90,13 @@ ASocket::ASocket(int init_fd) : _fd(new SocketFdRAII(init_fd))
 }
 
 /**
- * @brief 
+ * @brief Constructor creating a new socket.
  *
- * @param domain 
- * @param type
- * @param protocol
+ * @param domain Address family (e.g., AF_INET, AF_INET6).
+ * @param type Socket type (e.g., SOCK_STREAM, SOCK_DGRAM).
+ * @param protocol Protocol number (typically 0).
+ * @param isNonblock Whether to set the socket as non-blocking.
+ * @throw std::runtime_error If socket creation fails.
  */
 ASocket::ASocket(int domain, int type, int protocol, bool isNonblock) : _fd(new SocketFdRAII(-1))
 {
@@ -106,23 +110,23 @@ ASocket::ASocket(int domain, int type, int protocol, bool isNonblock) : _fd(new 
 }
 
 /**
- * @brief 
+ * @brief Virtual destructor for polymorphic cleanup.
  */
 ASocket::~ASocket() {}
 
 
 /**
- * @brief 
+ * @brief Copy constructor. Transfers ownership of the file descriptor.
  *
- * @param rhs
+ * @param rhs Socket to copy from.
  */
 ASocket::ASocket(const ASocket &rhs) : _fd(const_cast<ASocket&>(rhs)._fd.release()), _isNonblock(rhs._isNonblock) {}
 
 /**
- * @brief 
+ * @brief Assignment operator. Transfers ownership of the file descriptor.
  *
- * @param rhs
- * @return
+ * @param rhs Socket to assign from.
+ * @return Reference to this socket.
  */
 ASocket &ASocket::operator=(const ASocket &rhs)
 {
@@ -135,9 +139,11 @@ ASocket &ASocket::operator=(const ASocket &rhs)
 }
 
 /**
- * @brief 
+ * @brief Binds the socket to a local address.
  *
- * @param addr
+ * @param addr Local address to bind to.
+ * @param addrlen Length of the address structure.
+ * @throw std::runtime_error If bind fails.
  */
 void	ASocket::bind(const struct sockaddr *addr, socklen_t addrlen)
 {
@@ -146,9 +152,9 @@ void	ASocket::bind(const struct sockaddr *addr, socklen_t addrlen)
 }
 
 /**
- * @brief 
+ * @brief Gets the socket file descriptor.
  *
- * @return
+ * @return The file descriptor value.
  */
 int	ASocket::getFd() const
 {
@@ -156,9 +162,9 @@ int	ASocket::getFd() const
 }
 
 /**
- * @brief 
+ * @brief Checks if the socket is in non-blocking mode.
  *
- * @return
+ * @return True if non-blocking, false otherwise.
  */
 bool	ASocket::getIsNonblock() const
 {
@@ -166,9 +172,10 @@ bool	ASocket::getIsNonblock() const
 }
 
 /**
- * @brief 
+ * @brief Sets the socket to non-blocking or blocking mode.
  *
- * @param isNonblock
+ * @param isNonblock True for non-blocking, false for blocking.
+ * @throw std::runtime_error If fcntl fails.
  */
 void	ASocket::setIsNonblock(bool isNonblock)
 {
@@ -188,7 +195,9 @@ void	ASocket::setIsNonblock(bool isNonblock)
 }
 
 /**
- * @brief 
+ * @brief Closes the socket file descriptor.
+ *
+ * @throw std::runtime_error If close fails.
  */
 void	ASocket::close()
 {
@@ -199,9 +208,10 @@ void	ASocket::close()
 }
 
 /**
- * @brief 
+ * @brief Shuts down the socket connection.
  *
- * @param how
+ * @param how How to shut down (SHUT_RD, SHUT_WR, or SHUT_RDWR).
+ * @throw std::runtime_error If shutdown fails.
  */
 void	ASocket::shutdown(int how)
 {
@@ -210,9 +220,10 @@ void	ASocket::shutdown(int how)
 }
 
 /**
- * @brief 
+ * @brief Gets the socket file descriptor flags.
  *
- * @return
+ * @return File descriptor flags.
+ * @throw std::runtime_error If fcntl fails.
  */
 int	ASocket::getFlags() const
 {
@@ -224,11 +235,11 @@ int	ASocket::getFlags() const
 }
 
 /**
- * @brief 
+ * @brief Equality operator. Compares socket file descriptors.
  *
- * @param lhs
- * @param rhs
- * @return
+ * @param lhs Left-hand side socket.
+ * @param rhs Right-hand side socket.
+ * @return True if sockets have the same file descriptor.
  */
 bool	operator==(const ASocket &lhs, const ASocket &rhs)
 {
@@ -236,11 +247,11 @@ bool	operator==(const ASocket &lhs, const ASocket &rhs)
 }
 
 /**
- * @brief 
+ * @brief Inequality operator.
  *
- * @param lhs
- * @param rhs
- * @return
+ * @param lhs Left-hand side socket.
+ * @param rhs Right-hand side socket.
+ * @return True if sockets have different file descriptors.
  */
 bool	operator!=(const ASocket &lhs, const ASocket &rhs)
 {
@@ -248,11 +259,11 @@ bool	operator!=(const ASocket &lhs, const ASocket &rhs)
 }
 
 /**
- * @brief 
+ * @brief Less-than operator. Compares file descriptor values.
  *
- * @param lhs
- * @param rhs
- * @return
+ * @param lhs Left-hand side socket.
+ * @param rhs Right-hand side socket.
+ * @return True if lhs fd < rhs fd.
  */
 bool	operator<(const ASocket &lhs, const ASocket &rhs)
 {
@@ -260,11 +271,11 @@ bool	operator<(const ASocket &lhs, const ASocket &rhs)
 }
 
 /**
- * @brief 
+ * @brief Greater-than operator.
  *
- * @param lhs
- * @param rhs
- * @return
+ * @param lhs Left-hand side socket.
+ * @param rhs Right-hand side socket.
+ * @return True if lhs fd > rhs fd.
  */
 bool	operator>(const ASocket &lhs, const ASocket &rhs)
 {
@@ -272,11 +283,11 @@ bool	operator>(const ASocket &lhs, const ASocket &rhs)
 }
 
 /**
- * @brief 
+ * @brief Less-than-or-equal operator.
  *
- * @param lhs
- * @param rhs
- * @return
+ * @param lhs Left-hand side socket.
+ * @param rhs Right-hand side socket.
+ * @return True if lhs fd <= rhs fd.
  */
 bool	operator<=(const ASocket &lhs, const ASocket &rhs)
 {
@@ -284,11 +295,11 @@ bool	operator<=(const ASocket &lhs, const ASocket &rhs)
 }
 
 /**
- * @brief 
+ * @brief Greater-than-or-equal operator.
  *
- * @param lhs
- * @param rhs
- * @return
+ * @param lhs Left-hand side socket.
+ * @param rhs Right-hand side socket.
+ * @return True if lhs fd >= rhs fd.
  */
 bool	operator>=(const ASocket &lhs, const ASocket &rhs)
 {

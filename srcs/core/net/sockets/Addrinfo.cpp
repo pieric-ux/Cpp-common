@@ -12,7 +12,7 @@
 
 /**
  * @file Addrinfo.cpp
- * @brief 
+ * @brief Implementation of address information wrapper.
  */
 
 #include <common/core/raii/Deleters.hpp>
@@ -29,7 +29,7 @@ namespace net
 {
 
 /**
- * @brief 
+ * @brief Default constructor. Initializes with NULL addrinfo.
  */
 Addrinfo::Addrinfo() : _res(NULL) {}
 

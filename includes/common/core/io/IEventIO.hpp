@@ -15,7 +15,7 @@
 
 /**
  * @file IEventIO.hpp
- * @brief 
+ * @brief Interface for multiplexed I/O event management.
  */
 
 namespace common
@@ -27,7 +27,11 @@ namespace io
 
 /**
  * @class IEventIO
- * @brief [TODO:description]
+ * @brief Interface for I/O event handlers.
+ *
+ * This interface defines basic operations for monitoring file descriptors
+ * and waiting for events (read, write, exception) using different multiplexing
+ * mechanisms (select, poll, epoll, etc.).
  *
  * @startuml
  * interface "IEventIO" as IEventIO {
@@ -43,26 +47,29 @@ namespace io
 class IEventIO
 {
 	public:
-		/**
-		 * @brief [TODO:description]
-		 *
-		 * @startuml
-		 * enum "e_Event" as e_Event {
-				E_NONE
-				E_IN
-				E_OUT
-				E_EXCEPT
-			}
-		 * @enduml
-		 */
-		enum e_Event
-		{
-			E_NONE = 0,
-			E_IN = 1 << 0,
-			E_OUT = 1 << 1,
-			E_EXCEPT = 1 << 2,
-		};
-
+	/**
+	 * @enum e_Event
+	 * @brief Bitmasks for monitored event types.
+	 *
+	 * These flags can be combined with binary OR operator to
+	 * monitor multiple event types simultaneously.
+	 *
+	 * @startuml
+	 * enum "e_Event" as e_Event {
+			E_NONE
+			E_IN
+			E_OUT
+			E_EXCEPT
+		}
+	 * @enduml
+	 */
+	enum e_Event
+	{
+		E_NONE = 0,         ///< No event
+		E_IN = 1 << 0,      ///< Data available for reading
+		E_OUT = 1 << 1,     ///< Ready for writing
+		E_EXCEPT = 1 << 2,  ///< Exceptional condition
+	};
 		virtual ~IEventIO() {};
 
 		virtual int	wait(int timeout_ms) = 0;

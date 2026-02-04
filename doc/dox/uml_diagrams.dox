@@ -28,6 +28,11 @@
  * 
  * namespace common.core.io {
  * 
+ * 	enum "e_Type" as e_Type {
+ * 		SELECT
+ * 		POLL
+ * 	}
+ * 
  * 	enum "e_Event" as e_Event {
  * 		E_NONE
  * 		E_IN
@@ -41,6 +46,12 @@
  * 		fd_set except_fds
  * 		--
  * 		Sets()
+ * 	}
+ * 
+ * 	class "EventFactoryIO" as EventFactoryIO [[classcommon_1_1core_1_1io_1_1_event_factory_i_o.html]] {
+ * 		--
+ * 		+ {static} createEventIO(type : e_Type) : IEventIO*
+ * 		- EventFactoryIO()
  * 	}
  * 
  * 	interface "IEventIO" as IEventIO [[classcommon_1_1core_1_1io_1_1_i_event_i_o.html]] {
@@ -87,7 +98,9 @@
  * 
  * 	IEventIO <|.. SelectEventIO
  * 	IEventIO <|.. PollEventIO
- * 	SelectEventIO +-- Sets
+ * 	SelectEventIO +-- Sets : contains
+ * 	EventFactoryIO ..> e_Type : uses
+ * 	EventFactoryIO ..> IEventIO : creates
  * }
  * 
  * namespace common.core.net {
@@ -166,7 +179,7 @@
  * 	ASocket <|-- ATcpSocket
  * 	ATcpSocket <|-- TcpClient
  * 	ATcpSocket <|-- TcpServer
- * 	ASocket +-- SocketFdRAII
+ * 	ASocket +-- SocketFdRAII : owns
  * 	TcpServer "1" ..> "0..*" TcpClient : creates
  * }
  * 
@@ -259,10 +272,10 @@
  * 	IDeleter <|.. DefaultDeleteT
  * 	IDeleter <|.. DefaultDeleteArray
  * 	IDeleter <|.. AddrinfoDeleter
- * 	SharedPtrBase "0..*" o-- "0..1" SharedPtrControlBlock
+ * 	SharedPtrBase "0..*" o-- "0..1" SharedPtrControlBlock : shares
  * 	SharedPtrBase <|-- SharedPtrT
  * 	SharedPtrBase <|-- SharedPtrArray
- * 	WeakPtrT ..> SharedPtrControlBlock
+ * 	WeakPtrT ..> SharedPtrControlBlock : observes
  * 	UniquePtrBaseT <|-- UniquePtrT
  * 	UniquePtrBaseT <|-- UniquePtrArray
  * }
@@ -290,7 +303,7 @@
  * 		+ operator!=(rhs : DirectoryIterator) : bool
  * 	}
  * 
- * 	Directory +-- DirectoryIterator
+ * 	Directory +-- DirectoryIterator : iterates
  * }
  * 
  * namespace common.loader {

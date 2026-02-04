@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   ATcpSocket.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: blucken <blucken@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/02/03 15:34:11 by blucken           #+#    #+#             */
-/*   Updated: 2026/02/03 15:34:56 by blucken          ###   ########.fr       */
+/*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
+/*                                                     #+#    #+#             */
+/*   Created: 2026/01/15                              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 /**
  * @file ATcpSocket.cpp
- * @brief 
+ * @brief Implementation of abstract TCP socket base class.
  */
 
 #include <cerrno>
@@ -30,42 +30,43 @@ namespace net
 
 
 /**
- * @brief 
+ * @brief Default constructor. Creates an invalid TCP socket.
  */
 ATcpSocket::ATcpSocket() : ASocket() {}
 
 /**
- * @brief 
+ * @brief Constructor from an existing socket file descriptor.
  *
- * @param init_fd
+ * @param init_fd Existing socket file descriptor.
  */
 ATcpSocket::ATcpSocket(int init_fd) : ASocket(init_fd) {}
 
 /**
- * @brief 
+ * @brief Constructor creating a new TCP socket.
  *
- * @param init_domain
- * @param init_protocol
+ * @param init_domain Address family (AF_INET or AF_INET6).
+ * @param init_protocol Protocol number (typically IPPROTO_TCP).
+ * @param isNonblock Whether to set socket as non-blocking.
  */
 ATcpSocket::ATcpSocket(int init_domain, int init_protocol, bool isNonblock): ASocket(init_domain, SOCK_STREAM, init_protocol, isNonblock) {}
 
 /**
- * @brief 
+ * @brief Virtual destructor for polymorphic cleanup.
  */
 ATcpSocket::~ATcpSocket() {}
 
 /**
- * @brief 
+ * @brief Copy constructor.
  *
- * @param rhs
+ * @param rhs Socket to copy from.
  */
 ATcpSocket::ATcpSocket(const ATcpSocket &rhs) : ASocket(rhs) {}
 
 /**
- * @brief 
+ * @brief Assignment operator.
  *
- * @param rhs
- * @return
+ * @param rhs Socket to assign from.
+ * @return Reference to this socket.
  */
 ATcpSocket &ATcpSocket::operator=(const ATcpSocket &rhs)
 {
@@ -74,12 +75,13 @@ ATcpSocket &ATcpSocket::operator=(const ATcpSocket &rhs)
 }
 
 /**
- * @brief 
+ * @brief Receives data from the socket.
  *
- * @param buffer
- * @param length
- * @param flags 
- * @return
+ * @param buffer Buffer to store received data.
+ * @param length Maximum number of bytes to receive.
+ * @param flags Receive flags (default: 0).
+ * @return Number of bytes received.
+ * @throw std::runtime_error If recv fails.
  */
 ssize_t	ATcpSocket::recv(void *buffer, std::size_t length, int flags) const
 {
@@ -90,12 +92,13 @@ ssize_t	ATcpSocket::recv(void *buffer, std::size_t length, int flags) const
 }
 
 /**
- * @brief 
+ * @brief Sends data through the socket.
  *
- * @param buffer
- * @param length
- * @param flags
- * @return
+ * @param buffer Data to send.
+ * @param length Number of bytes to send.
+ * @param flags Send flags (default: 0).
+ * @return Number of bytes sent.
+ * @throw std::runtime_error If send fails.
  */
 ssize_t ATcpSocket::send(const void *buffer, std::size_t length, int flags) const
 {

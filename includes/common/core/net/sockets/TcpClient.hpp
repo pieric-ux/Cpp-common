@@ -15,7 +15,7 @@
 
 /**
  * @file TcpClient.hpp
- * @brief 
+ * @brief TCP client socket implementation.
  */
 
 #include <common/core/net/sockets/ATcpSocket.hpp>
@@ -29,7 +29,10 @@ namespace net
 
 /**
  * @class TcpClient
- * @brief 
+ * @brief TCP client socket implementation.
+ *
+ * Provides TCP client functionality including connection establishment.
+ * Can be used to connect to remote TCP servers.
  *
  * @startuml
  * class "TcpClient" as TcpClient {

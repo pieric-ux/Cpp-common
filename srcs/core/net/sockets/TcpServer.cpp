@@ -12,7 +12,7 @@
 
 /**
  * @file TcpServer.cpp
- * @brief 
+ * @brief Implementation of TCP server socket.
  */
 
 #include <common/core/net/sockets/ATcpSocket.hpp>
@@ -28,42 +28,43 @@ namespace net
 {
 
 /**
- * @brief 
+ * @brief Default constructor. Creates an invalid TCP server socket.
  */
 TcpServer::TcpServer() : ATcpSocket() {}
 
 /**
- * @brief 
+ * @brief Constructor from an existing socket file descriptor.
  *
- * @param init_fd
+ * @param init_fd Existing socket file descriptor.
  */
 TcpServer::TcpServer(int init_fd) : ATcpSocket(init_fd) {}
 
 /**
- * @brief 
+ * @brief Constructor creating a new TCP server socket.
  *
- * @param init_domain
- * @param init_protocol
+ * @param init_domain Address family (AF_INET or AF_INET6).
+ * @param init_protocol Protocol number (typically IPPROTO_TCP).
+ * @param isNonblock Whether to set socket as non-blocking.
  */
 TcpServer::TcpServer(int init_domain, int init_protocol, bool isNonblock) : ATcpSocket(init_domain, init_protocol, isNonblock) {}
 
 /**
- * @brief 
+ * @brief Destructor.
  */
 TcpServer::~TcpServer() {}
 
 /**
- * @brief 
+ * @brief Copy constructor.
  *
- * @param rhs
+ * @param rhs Socket to copy from.
  */
 TcpServer::TcpServer(const TcpServer &rhs) : ATcpSocket(rhs) {}
 
 /**
- * @brief 
+ * @brief Assignment operator.
  *
- * @param rhs
- * @return
+ * @param rhs Socket to assign from.
+ * @return Reference to this socket.
  */
 TcpServer &TcpServer::operator=(const TcpServer &rhs)
 {
@@ -72,9 +73,10 @@ TcpServer &TcpServer::operator=(const TcpServer &rhs)
 }
 
 /**
- * @brief 
+ * @brief Marks the socket as a passive socket accepting incoming connections.
  *
- * @param backlog
+ * @param backlog Maximum number of pending connections.
+ * @throw std::runtime_error If listen fails.
  */
 void	TcpServer::listen(int backlog)
 {

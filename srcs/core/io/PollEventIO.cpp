@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   PollEventIO.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: blucken <blucken@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/02/02 23:18:23 by blucken           #+#    #+#             */
-/*   Updated: 2026/02/03 15:57:19 by blucken          ###   ########.fr       */
+/*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
+/*                                                     #+#    #+#             */
+/*   Created: 2026/01/26                              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "common/core/io/IEventIO.hpp"
-#include <algorithm>
+#include <common/core/io/IEventIO.hpp>
 #include <common/core/io/PollEventIO.hpp>
 #include <cstring>
 #include <cerrno>
@@ -20,9 +19,7 @@
 
 /**
  * @file PollEventIO.cpp
- * @brief 
- *     #include <poll.h>
-       int poll(struct pollfd *fds, nfds_t nfds, int timeout);
+ * @brief Implementation of poll(2)-based I/O event handler.
  */
 
 namespace common
@@ -33,19 +30,21 @@ namespace io
 {
 
 /**
- * @brief [TODO:description]
+ * @brief Default constructor. Initializes empty poll structures.
  */
 PollEventIO::PollEventIO() : _events(), _pollfds() {}
 
 /**
- * @brief [TODO:description]
+ * @brief Destructor.
  */
 PollEventIO::~PollEventIO() {}
 
 /**
- * @brief [TODO:description]
+ * @brief Waits for events on monitored file descriptors.
  *
- * @param timeout_ms [TODO:parameter]
+ * @param timeout_ms Timeout in milliseconds (-1 for infinite, 0 for non-blocking).
+ * @return Number of file descriptors with events, or 0 on timeout.
+ * @throw std::runtime_error If poll fails.
  */
 int	PollEventIO::wait(int timeout_ms)
 {
@@ -62,10 +61,10 @@ int	PollEventIO::wait(int timeout_ms)
 }
 
 /**
- * @brief [TODO:description]
+ * @brief Adds a file descriptor to monitor for events.
  *
- * @param fd [TODO:parameter]
- * @param mask [TODO:parameter]
+ * @param fd File descriptor to add.
+ * @param mask Event mask to monitor (E_IN, E_OUT, E_EXCEPT).
  */
 void PollEventIO::add(int fd, e_Event mask)
 {
@@ -74,9 +73,9 @@ void PollEventIO::add(int fd, e_Event mask)
 }
 
 /**
- * @brief [TODO:description]
+ * @brief Removes a file descriptor from monitoring.
  *
- * @param fd [TODO:parameter]
+ * @param fd File descriptor to remove.
  */
 void PollEventIO::remove(int fd)
 {
@@ -87,10 +86,10 @@ void PollEventIO::remove(int fd)
 }
 
 /**
- * @brief [TODO:description]
+ * @brief Updates the event mask for a monitored file descriptor.
  *
- * @param fd [TODO:parameter]
- * @param mask [TODO:parameter]
+ * @param fd File descriptor to update.
+ * @param mask New event mask.
  */
 void PollEventIO::update(int fd, e_Event mask)
 {
@@ -100,7 +99,7 @@ void PollEventIO::update(int fd, e_Event mask)
 }
 
 /**
- * @brief [TODO:description]
+ * @brief Removes all monitored file descriptors.
  */
 void PollEventIO::clear()
 {
@@ -109,10 +108,10 @@ void PollEventIO::clear()
 }
 
 /**
- * @brief [TODO:description]
+ * @brief Gets the detected events for a file descriptor.
  *
- * @param fd [TODO:parameter]
- * @return [TODO:return]
+ * @param fd File descriptor to query.
+ * @return Detected event mask (E_NONE if fd not monitored).
  */
 IEventIO::e_Event PollEventIO::getEvents(int fd) const
 {
@@ -123,11 +122,9 @@ IEventIO::e_Event PollEventIO::getEvents(int fd) const
 }
 
 /**
- * @brief [TODO:description]
+ * @brief Converts IEventIO event mask to poll(2) event mask.
  * 
  *     POLLIN There is data to read.
-
-       POLLPRI //TODO: a inclure?
               There is some exceptional condition on the file descriptor.
               Possibilities include:
 
@@ -156,11 +153,7 @@ IEventIO::e_Event PollEventIO::getEvents(int fd) const
               closed its end of the channel.  Subsequent reads from the
               channel will return 0 (end of file) only after all
               outstanding data in the channel has been consumed.
-
- * @param event [TODO:parameter]
- * @return [TODO:return]
  */
-
 short PollEventIO::eventToMask(e_Event event) const
 {
 	short mask = 0;
@@ -176,10 +169,10 @@ short PollEventIO::eventToMask(e_Event event) const
 }
 
 /**
- * @brief [TODO:description]
+ * @brief Converts poll(2) event mask to IEventIO event mask.
  *
- * @param mask [TODO:parameter]
- * @return [TODO:return]
+ * @param mask poll(2) event mask.
+ * @return Corresponding IEventIO event mask.
  */
 IEventIO::e_Event PollEventIO::maskToEvent(short mask) const
 {
@@ -196,9 +189,9 @@ IEventIO::e_Event PollEventIO::maskToEvent(short mask) const
 }
 
 /**
- * @brief [TODO:description]
+ * @brief Rebuilds the pollfd vector from the event map.
  */
-void PollEventIO::     rebuildPollFds()
+void PollEventIO::rebuildPollFds()
 {
 	_pollfds.clear();
 
@@ -215,7 +208,7 @@ void PollEventIO::     rebuildPollFds()
 }
 
 /**
- * @brief [TODO:description]
+ * @brief Updates detected events from poll(2) results.
  */
 void PollEventIO::updateEvents()
 {
@@ -238,3 +231,30 @@ void PollEventIO::updateEvents()
 } // !io
 } // !core
 } // !common
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                MIT License                                 */
+/*                                                                            */
+/*   Copyright (c) 2026 Demont Pieric, Lucken Bénédict                        */
+/*                                                                            */
+/*   Permission is hereby granted, free of charge, to any person obtaining    */
+/*   a copy of this software and associated documentation files (the          */
+/*   "Software"), to deal in the Software without restriction, including      */
+/*   without limitation the rights to use, copy, modify, merge, publish,      */
+/*   distribute, sublicense, and/or sell copies of the Software, and to       */
+/*   permit persons to whom the Software is furnished to do so, subject to    */
+/*   the following conditions:                                                */
+/*                                                                            */
+/*   The above copyright notice and this permission notice shall be included  */
+/*   in all copies or substantial portions of the Software.                   */
+/*                                                                            */
+/*   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  */
+/*   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF               */
+/*   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.   */
+/*   IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY     */
+/*   CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,     */
+/*   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE        */
+/*   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                   */
+/*                                                                            */
+/* ************************************************************************** */

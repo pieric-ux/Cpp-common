@@ -15,7 +15,7 @@
 
 /**
  * @file TcpServer.hpp
- * @brief 
+ * @brief TCP server socket implementation.
  */
 
 #include <cerrno>
@@ -36,7 +36,10 @@ namespace net
 
 /**
  * @class TcpServer
- * @brief 
+ * @brief TCP server socket implementation.
+ *
+ * Provides TCP server functionality including listening for connections and
+ * accepting client connections. Supports template-based client handling.
  *
  * @startuml
  * class "TcpServer" as TcpServer {

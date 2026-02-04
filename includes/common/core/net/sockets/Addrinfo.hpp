@@ -15,7 +15,7 @@
 
 /**
  * @file Addrinfo.hpp
- * @brief 
+ * @brief Address information wrapper for network operations.
  */
 
 #include <common/core/raii/SharedPtr.hpp>
@@ -32,7 +32,10 @@ namespace net
 
 /**
  * @class Addrinfo
- * @brief 
+ * @brief RAII wrapper for getaddrinfo() results.
+ *
+ * Encapsulates the addrinfo structure returned by getaddrinfo() with automatic
+ * memory management via SharedPtr. Provides convenient access to resolved addresses.
  *
  * @startuml
  * class "Addrinfo" as Addrinfo {
