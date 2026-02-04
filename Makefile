@@ -33,7 +33,7 @@ vpath %.cpp \
 	$(SRCDIR)/$(LOADERDIR)
 
 # Sources and object files
-SRCES = SelectEventIO.cpp \
+SRCES = EventFactoryIO.cpp SelectEventIO.cpp PollEventIO.cpp \
 		ASocket.cpp ATcpSocket.cpp Addrinfo.cpp TcpClient.cpp TcpServer.cpp \
 		SharedPtr.cpp \
 		Directory.cpp fileUtils.cpp stringUtils.cpp timeUtils.cpp \
