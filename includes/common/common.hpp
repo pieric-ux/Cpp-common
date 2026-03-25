@@ -21,6 +21,11 @@
  * to provide convenient access to commonly used components throughout the project.
  */
 
+#include <common/core/io/EventFactoryIO.hpp>
+#include <common/core/io/IEventIO.hpp>
+#include <common/core/io/PollEventIO.hpp>
+#include <common/core/io/SelectEventIO.hpp>
+
 #include <common/core/net/sockets/Addrinfo.hpp>
 #include <common/core/net/sockets/TcpClient.hpp>
 #include <common/core/net/sockets/TcpServer.hpp>
