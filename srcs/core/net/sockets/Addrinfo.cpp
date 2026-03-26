@@ -20,6 +20,7 @@
 #include <common/core/net/sockets/Addrinfo.hpp>
 #include <netdb.h>
 #include <string>
+#include <stdexcept>
 
 namespace common
 {
