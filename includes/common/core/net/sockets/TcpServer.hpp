@@ -67,22 +67,28 @@ class TcpServer : public ATcpSocket
 		void	listen(int backlog = SOMAXCONN);
 
 		/**
-		 * @brief 
+		 * @brief Accepts an incoming connection and returns the client with its address.
 		 *
-		 * @tparam T
-		 * @return
+		 * Calls `::accept()` on the server socket, wraps the resulting file descriptor
+		 * in a `TcpClient`, and fills an address structure of type `T` with the remote
+		 * peer's address information.
+		 *
+		 * @tparam T Socket address structure type (e.g. `sockaddr_in`, `sockaddr_in6`).
+		 *           Must be reinterpret-castable to `struct sockaddr`.
+		 * @return A pair of the accepted `TcpClient` and the filled address structure `T`.
+		 * @throws std::runtime_error If `::accept()` fails (errno message is included).
 		 */
-		   template<typename T>
-		   std::pair<TcpClient, T> accept()
-		   {
-			   T addr = {};
-			   socklen_t len = sizeof(T);
-			   int cfd = ::accept(_fd->get(), reinterpret_cast<struct sockaddr *>(&addr), &len);
-			   if (cfd == -1)
-				   throw std::runtime_error("accept failed: " + std::string(std::strerror(errno)));
-			   TcpClient cs(cfd);
-			   return std::make_pair(cs, addr);
-		   }
+		template<typename T>
+		std::pair<TcpClient, T> accept() const
+		{
+			T addr = {};
+			socklen_t len = sizeof(T);
+			int cfd = ::accept(_fd->get(), reinterpret_cast<struct sockaddr *>(&addr), &len);
+			if (cfd == -1)
+				throw std::runtime_error("accept failed: " + std::string(std::strerror(errno)));
+			TcpClient cs(cfd);
+			return std::make_pair(cs, addr);
+		}
 };
 
 } // !net
