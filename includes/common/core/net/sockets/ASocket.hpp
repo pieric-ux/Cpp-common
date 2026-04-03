@@ -153,15 +153,18 @@ class ASocket : public ISocket
 	protected:
 		/**
 		 * @class SocketFdRAII
-		 * @brief 
+		 * @brief RAII wrapper for a socket file descriptor.
+		 *
+		 * Owns a socket file descriptor and closes it automatically on destruction.
+		 * Non-copyable to enforce unique ownership.
 		 *
 		 * @startuml
 		 * class "SocketFdRAII" as SocketFdRAII {
 				- _fdRef : int
 				--
 				+ SocketFdRAII(init_fd : int)
-				+ getFd() : int
-				+ setFd(new_fd : int) : void
+				+ get() : int
+				+ set(new_fd : int) : void
 			}
 		 * @enduml
 		 */

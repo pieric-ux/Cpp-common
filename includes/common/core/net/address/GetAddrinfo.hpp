@@ -1,73 +1,75 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   algoUtils.hpp                                      :+:      :+:    :+:   */
+/*   GetAddrinfo.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
 /*                                                     #+#    #+#             */
-/*   Created: 2025/10/16                              ###   ########.fr       */
+/*   Created: 2026/01/15                              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef COMMON_ALGOUTILS_HPP
-#define COMMON_ALGOUTILS_HPP
+#ifndef COMMON_GETADDRINFO_HPP
+#define COMMON_GETADDRINFO_HPP
 
 /**
- * @file algoUtils.hpp
- * @brief Utility algorithms for generic operations such as swapping values and arrays.
+ * @file GetAddrinfo.hpp
+ * @brief RAII wrapper for getaddrinfo() results.
  */
 
-#include <cstddef>
+#include <common/core/raii/SharedPtr.hpp>
+#include <netdb.h>
+#include <sys/socket.h>
+#include <sys/types.h>
 
 namespace common
 {
 namespace core
 {
-namespace utils
+namespace net
 {
 
 /**
- * @brief Swaps the values of two objects (or pointers) of type T by reference.
+ * @class GetAddrinfo
+ * @brief RAII wrapper for getaddrinfo() results.
  *
- * This function takes its arguments by reference and swaps their values. If T
- * is a pointer type (for example T = Foo*), the function will swap the
- * pointers themselves (references to pointers).
+ * Encapsulates the addrinfo structure returned by getaddrinfo() with automatic
+ * memory management via SharedPtr. Provides convenient access to resolved addresses.
  *
- * @tparam T Type of the values to swap (may be a pointer type).
- * @param a Reference to the first value.
- * @param b Reference to the second value.
- */
-template<typename T>
-void	swap(T &a, T &b)
-{
-	T tmp = a;
-	a = b;
-	b = tmp;
-}
-
-/**
- * @brief Swaps the contents of two arrays of type T and size N.
- *
- * @tparam T Type of the array elements.
- * @tparam N Size of the arrays.
- * @param a Reference to the first array.
- * @param b Reference to the second array.
- */
-template<typename T, std::size_t N>
-void	swap(T (&a)[N], T (&b)[N])
-{
-	for (std::size_t i = 0; i < N; ++i)
-	{
-		swap(a[i], b[i]);
+ * @startuml
+ * class "GetAddrinfo" as GetAddrinfo {
+		-  _res : addrinfo
+		--
+		+ GetAddrinfo()
+		+ GetAddrinfo(hostname : string, servname : string, ai_flags : int, ai_family : int, ai_socktype : int, ai_protocol : int)
+		+ getRes() : addrinfo
 	}
-}
+ * @enduml
+ */
+class GetAddrinfo
+{
+	public:
+		GetAddrinfo();
+		GetAddrinfo(const char *hostname, const char *servname,
+				int ai_flags = 0, int ai_family = 0,
+				int ai_socktype = 0, int ai_protocol = 0);
+		~GetAddrinfo();
 
-} // !utils
+		GetAddrinfo(const GetAddrinfo &rhs);
+		GetAddrinfo &operator=(const GetAddrinfo &rhs);
+
+		struct addrinfo *getRes() const;
+
+	private:
+		common::core::raii::SharedPtr<struct addrinfo> _res;
+};
+
+} // !net
 } // !core
 } // !common
 
-#endif // !COMMON_ALGOUTILS_HPP
+#endif // !COMMON_GETADDRINFO_HPP
 
 /* ************************************************************************** */
 /*                                                                            */

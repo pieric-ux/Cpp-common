@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Addrinfo.hpp                                       :+:      :+:    :+:   */
+/*   GetAddrinfo.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
@@ -10,18 +10,17 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef COMMON_ADDRINFO_HPP
-#define COMMON_ADDRINFO_HPP
-
 /**
- * @file Addrinfo.hpp
- * @brief Address information wrapper for network operations.
+ * @file GetAddrinfo.cpp
+ * @brief Implementation of address information wrapper.
  */
 
+#include <common/core/raii/Deleters.hpp>
 #include <common/core/raii/SharedPtr.hpp>
+#include <common/core/net/address/GetAddrinfo.hpp>
 #include <netdb.h>
-#include <sys/socket.h>
-#include <sys/types.h>
+#include <string>
+#include <stdexcept>
 
 namespace common
 {
@@ -31,45 +30,77 @@ namespace net
 {
 
 /**
- * @class Addrinfo
- * @brief RAII wrapper for getaddrinfo() results.
- *
- * Encapsulates the addrinfo structure returned by getaddrinfo() with automatic
- * memory management via SharedPtr. Provides convenient access to resolved addresses.
- *
- * @startuml
- * class "Addrinfo" as Addrinfo {
-		-  _res : addrinfo
-		--
-		+ Addrinfo()
-		+ Addrinfo(hostname : string, servname : string, ai_flags : int, ai_family : int, ai_socktype : int, ai_protocol : int)
-		+ getRes() : addrinfo
-	}
- * @enduml
+ * @brief Default constructor. Initializes with NULL addrinfo.
  */
-class Addrinfo
+GetAddrinfo::GetAddrinfo() : _res(NULL) {}
+
+/**
+ * @brief Resolves the given hostname/service and stores the result.
+ *
+ * @param hostname Hostname or IP address string (may be NULL for wildcard).
+ * @param servname Service name or port number string.
+ * @param ai_flags getaddrinfo() flags (e.g. AI_PASSIVE, AI_NUMERICSERV).
+ * @param ai_family Address family (e.g. AF_UNSPEC, AF_INET, AF_INET6).
+ * @param ai_socktype Socket type (e.g. SOCK_STREAM).
+ * @param ai_protocol Protocol (0 for auto-select).
+ * @throw std::runtime_error If getaddrinfo() fails.
+ */
+GetAddrinfo::GetAddrinfo(const char *hostname, const char *servname,
+				   int ai_flags, int ai_family,
+				   int ai_socktype, int ai_protocol)
 {
-	public:
-		Addrinfo();
-		Addrinfo(const char *hostname, const char *servname,
-				int ai_flags = 0, int ai_family = 0,
-				int ai_socktype = 0, int ai_protocol = 0);
-		~Addrinfo();
+	struct addrinfo hints = {}, *res = NULL;
+	int error;
 
-		Addrinfo(const Addrinfo &rhs);
-		Addrinfo &operator=(const Addrinfo &rhs);
+	hints.ai_flags = ai_flags;
+	hints.ai_family = ai_family;
+	hints.ai_socktype = ai_socktype;
+	hints.ai_protocol = ai_protocol;
 
-		struct addrinfo *getRes() const;
+	error = getaddrinfo(hostname, servname, &hints, &res);
+	if (error)
+		throw std::runtime_error("getaddrinfo failed: " + std::string(gai_strerror(error)));
+	_res = common::core::raii::SharedPtr<struct addrinfo>(res, new raii::AddrinfoDeleter());
+}
 
-	private:
-		common::core::raii::SharedPtr<struct addrinfo> _res;
-};
+/**
+ * @brief Destructor. Releases the shared addrinfo chain via SharedPtr.
+ */
+GetAddrinfo::~GetAddrinfo() {}
+
+/**
+ * @brief Copy constructor. Shares ownership of the addrinfo chain via SharedPtr.
+ *
+ * @param rhs Source object to copy from.
+ */
+GetAddrinfo::GetAddrinfo(const GetAddrinfo &rhs) : _res(rhs._res) {}
+
+/**
+ * @brief Copy assignment operator. Shares ownership of the addrinfo chain via SharedPtr.
+ *
+ * @param rhs Source object to assign from.
+ * @return Reference to this object.
+ */
+GetAddrinfo &GetAddrinfo::operator=(const GetAddrinfo &rhs)
+{
+	if (this != &rhs)
+		_res = rhs._res;
+	return (*this);
+}
+
+/**
+ * @brief Returns the head of the resolved addrinfo linked list.
+ *
+ * @return Pointer to the first addrinfo entry, or NULL if not resolved.
+ */
+struct addrinfo *GetAddrinfo::getRes() const
+{
+	return (_res.get());
+}
 
 } // !net
 } // !core
 } // !common
-
-#endif // !COMMON_ADDRINFO_HPP
 
 /* ************************************************************************** */
 /*                                                                            */

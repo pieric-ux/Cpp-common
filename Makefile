@@ -10,6 +10,7 @@ COREDIR = core
 IODIR = io
 NETDIR = net
 SOCKETDIR = sockets
+ADDRESSDIR = address
 UTIlSDIR = utils
 RAIIDIR = raii
 LOADERDIR = loader
@@ -28,13 +29,15 @@ vpath %.cpp \
 	$(SRCDIR)/$(COREDIR) \
 	$(SRCDIR)/$(COREDIR)/$(IODIR) \
 	$(SRCDIR)/$(COREDIR)/$(NETDIR)/$(SOCKETDIR) \
+	$(SRCDIR)/$(COREDIR)/$(NETDIR)/$(ADDRESSDIR) \
 	$(SRCDIR)/$(COREDIR)/$(RAIIDIR) \
 	$(SRCDIR)/$(COREDIR)/$(UTIlSDIR) \
 	$(SRCDIR)/$(LOADERDIR)
 
 # Sources and object files
 SRCES = EventFactoryIO.cpp SelectEventIO.cpp PollEventIO.cpp \
-		ASocket.cpp ATcpSocket.cpp Addrinfo.cpp TcpClient.cpp TcpServer.cpp \
+		ASocket.cpp ATcpSocket.cpp TcpClient.cpp TcpServer.cpp \
+		GetAddrinfo.cpp \
 		SharedPtr.cpp \
 		Directory.cpp fileUtils.cpp stringUtils.cpp timeUtils.cpp \
 		Loader.cpp

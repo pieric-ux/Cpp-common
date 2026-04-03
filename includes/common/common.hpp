@@ -26,7 +26,8 @@
 #include <common/core/io/PollEventIO.hpp>
 #include <common/core/io/SelectEventIO.hpp>
 
-#include <common/core/net/sockets/Addrinfo.hpp>
+#include <common/core/net/address/GetNameInfo.hpp>
+#include <common/core/net/address/GetAddrinfo.hpp>
 #include <common/core/net/sockets/TcpClient.hpp>
 #include <common/core/net/sockets/TcpServer.hpp>
 
