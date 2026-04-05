@@ -46,10 +46,10 @@ namespace io
 		- _events : map<int, e_Event>
 		- _pollfds : vector<pollfd>
 		--
+		- prepareWait() : void
+		- processResults() : void
 		- eventToMask(event : e_Event) : short
 		- maskToEvent(mask : short) : e_Event
-		- rebuildPollFds() : void
-		- updateEvents() : void
 		+ PollEventIO()
 		+ wait(timeout_ms : int) : int
 		+ add(fd : int, mask : e_Event) : void
@@ -78,12 +78,14 @@ class PollEventIO : public IEventIO
 		PollEventIO(const PollEventIO &rhs);
 		PollEventIO &operator=(const PollEventIO &rhs);
 
+		void			prepareWait();
+		void			processResults();
+
 		short			eventToMask(e_Event event) const;
 		e_Event			maskToEvent(short mask) const;
-		void			rebuildPollFds();
-		void			updateEvents();
 
 		std::map<int, e_Event>		_events;
+		std::map<int, e_Event>		_ready;
 		std::vector<struct pollfd>	_pollfds;
 };
 

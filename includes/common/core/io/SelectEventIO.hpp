@@ -44,8 +44,8 @@ namespace io
 		- _set : map<int, e_Event>
 		- _nfds : int
 		--
-		- initSets(sets : Sets) : void
-		- updateSets(sets : Sets) : void
+		- prepareWait(sets : Sets) : void
+		- processResults(sets : Sets) : void
 		- initTimeout(timeout_ms : int) : timeval
 		+ SelectEventIO()
 		+ wait(timeout_ms : int) : int
@@ -98,11 +98,13 @@ class SelectEventIO : public IEventIO
 		SelectEventIO(const SelectEventIO &rhs);
 		SelectEventIO &operator=(const SelectEventIO &rhs);
 
-		void			initSets(Sets &sets) const;
-		void			updateSets(Sets &sets);
+		void			prepareWait(Sets &sets) const;
+		void			processResults(Sets &sets);
+
 		struct timeval	initTimeout(int timeout_ms);
 
-		std::map<int, e_Event>	_set;
+		std::map<int, e_Event>	_events;
+		std::map<int, e_Event>	_ready;
 		int						_nfds;
 };
 

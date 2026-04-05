@@ -32,7 +32,7 @@ namespace io
 /**
  * @brief Default constructor. Initializes empty poll structures.
  */
-PollEventIO::PollEventIO() : _events(), _pollfds() {}
+PollEventIO::PollEventIO() : _events(), _ready(), _pollfds() {}
 
 /**
  * @brief Destructor.
@@ -52,11 +52,11 @@ int	PollEventIO::wait(int timeout_ms)
 
 	if (_events.empty())
 		return (0);
-	rebuildPollFds();
+	prepareWait();
 	if ((ready = ::poll(&_pollfds[0], _pollfds.size(), timeout_ms)) == -1)
 		throw std::runtime_error("poll failed: " + std::string(std::strerror(errno)));
 	if (ready)
-		updateEvents();
+		processResults();
 	return (ready);
 }
 
@@ -68,7 +68,6 @@ int	PollEventIO::wait(int timeout_ms)
  */
 void PollEventIO::add(int fd, e_Event mask)
 {
-	// TODO: check FD_SETSIZE?
 	_events[fd] = mask;
 }
 
@@ -80,9 +79,11 @@ void PollEventIO::add(int fd, e_Event mask)
 void PollEventIO::remove(int fd)
 {
 	std::map<int, e_Event>::iterator it = _events.find(fd);
-	
-	if (it != _events.end())
-		_events.erase(it);
+	if (it == _events.end())
+		return ;
+
+	_events.erase(it);
+	_ready.erase(fd);
 }
 
 /**
@@ -104,6 +105,7 @@ void PollEventIO::update(int fd, e_Event mask)
 void PollEventIO::clear()
 {
 	_events.clear();
+	_ready.clear();
 	_pollfds.clear();
 }
 
@@ -115,10 +117,45 @@ void PollEventIO::clear()
  */
 IEventIO::e_Event PollEventIO::getEvents(int fd) const
 {
-	std::map<int, e_Event>::const_iterator it = _events.find(fd);
-	if (it == _events.end())
+	std::map<int, e_Event>::const_iterator it = _ready.find(fd);
+	if (it == _ready.end())
 		return (E_NONE);
 	return (it->second);
+}
+
+/**
+ * @brief Rebuilds the pollfd vector from the event map.
+ */
+void PollEventIO::prepareWait()
+{
+	_pollfds.clear();
+
+	std::map<int, e_Event>::const_iterator it;
+	for (it = _events.begin(); it != _events.end(); ++it)
+	{
+		struct pollfd pfd;
+		pfd.fd = it->first;
+		pfd.events = eventToMask(it->second);
+		pfd.revents = 0;
+		_pollfds.push_back(pfd);
+	}
+}
+
+/**
+ * @brief Updates detected events from poll(2) results.
+ */
+void PollEventIO::processResults()
+{
+	_ready.clear();
+	for (size_t i = 0; i < _pollfds.size(); ++i)
+	{
+		if (_pollfds[i].revents != 0)
+		{
+			e_Event mask = maskToEvent(_pollfds[i].revents);
+			if (mask)
+				_ready[_pollfds[i].fd] = mask;
+		}
+	}
 }
 
 /**
@@ -186,46 +223,6 @@ IEventIO::e_Event PollEventIO::maskToEvent(short mask) const
 		event = static_cast<e_Event>(event | E_EXCEPT);
 	
 	return (event);
-}
-
-/**
- * @brief Rebuilds the pollfd vector from the event map.
- */
-void PollEventIO::rebuildPollFds()
-{
-	_pollfds.clear();
-
-	std::map<int, e_Event>::const_iterator it;
-	
-	for (it = _events.begin(); it != _events.end(); ++it)
-	{
-		struct pollfd pfd;
-		pfd.fd = it->first;
-		pfd.events = eventToMask(it->second);
-		pfd.revents = 0;
-		_pollfds.push_back(pfd);
-	}
-}
-
-/**
- * @brief Updates detected events from poll(2) results.
- */
-void PollEventIO::updateEvents()
-{
-	std::map<int, e_Event>::iterator it;
-
-	// for (it = _events.begin(); it != _events.end(); ++it)
-	// 	it->second = E_NONE;
-	
-	for (size_t i = 0; i < _pollfds.size(); ++i)
-	{
-		if (_pollfds[i].revents != 0)
-		{
-			e_Event mask = maskToEvent(_pollfds[i].revents);
-			if (mask)
-				_events[_pollfds[i].fd] = mask;
-		}
-	}
 }
 
 } // !io

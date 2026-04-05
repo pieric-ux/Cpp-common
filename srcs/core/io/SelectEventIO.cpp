@@ -34,7 +34,7 @@ namespace io
 {
 
 /**
- * @brief Constructor. Initializes all fd_set structures to zero.
+ * @brief Constructor. Initializes all fd_events structures to zero.
  */
 SelectEventIO::Sets::Sets()
 {
@@ -46,7 +46,7 @@ SelectEventIO::Sets::Sets()
 /**
  * @brief Default constructor. Initializes empty event sets.
  */
-SelectEventIO::SelectEventIO() : _set(), _nfds(0) {}
+SelectEventIO::SelectEventIO() : _events(), _ready(), _nfds(0) {}
 
 /**
  * @brief Destructor.
@@ -66,12 +66,12 @@ int	SelectEventIO::wait(int timeout_ms)
 	Sets sets;
 	int	ready;
 
-	initSets(sets);
+	prepareWait(sets);
 	tv = initTimeout(timeout_ms);
 	if ((ready = ::select(_nfds, &sets._readfds, &sets._writefds, &sets._exceptfds, &tv)) == -1)
 		throw std::runtime_error("select failed: " + std::string(std::strerror(errno)));
 	if (ready)
-		updateSets(sets);
+		processResults(sets);
 	return (ready);
 }
 
@@ -88,7 +88,7 @@ void SelectEventIO::add(int fd, e_Event mask)
 		throw std::runtime_error("file descriptor exceeds limit " + common::core::utils::toString(FD_SETSIZE));
 	if (fd >= _nfds)
 		_nfds = fd + 1;
-	_set[fd] = mask;
+	_events[fd] = mask;
 }
 
 /**
@@ -98,14 +98,16 @@ void SelectEventIO::add(int fd, e_Event mask)
  */
 void SelectEventIO::remove(int fd)
 {
-	std::map<int, e_Event>::iterator it = _set.find(fd);
-	if (it == _set.end())
+	std::map<int, e_Event>::iterator it = _events.find(fd);
+	if (it == _events.end())
 		return ;
-	_set.erase(it);
-	if (_set.empty())
+
+	_events.erase(it);
+	_ready.erase(fd);
+	if (_events.empty())
 		_nfds = 0;
 	else
-		_nfds = std::max_element(_set.begin(), _set.end())->first + 1;
+		_nfds = std::max_element(_events.begin(), _events.end())->first + 1;
 }
 
 /**
@@ -116,8 +118,8 @@ void SelectEventIO::remove(int fd)
  */
 void SelectEventIO::update(int fd, e_Event mask)
 {
-	std::map<int, e_Event>::iterator it = _set.find(fd);
-	if (it != _set.end())
+	std::map<int, e_Event>::iterator it = _events.find(fd);
+	if (it != _events.end())
 		it->second = mask;
 }
 
@@ -126,7 +128,8 @@ void SelectEventIO::update(int fd, e_Event mask)
  */
 void SelectEventIO::clear()
 {
-	_set.clear();
+	_events.clear();
+	_ready.clear();
 	_nfds = 0;
 }
 
@@ -138,21 +141,21 @@ void SelectEventIO::clear()
  */
 IEventIO::e_Event SelectEventIO::getEvents(int fd) const
 {
-	std::map<int, e_Event>::const_iterator it = _set.find(fd);
-	if (it == _set.end())
+	std::map<int, e_Event>::const_iterator it = _ready.find(fd);
+	if (it == _ready.end())
 		return (E_NONE);
 	return (it->second);
 }
 
 /**
- * @brief Initializes fd_set structures based on monitored events.
+ * @brief Initializes fd_events structures based on monitored events.
  *
  * @param sets Sets structure to populate.
  */
-void SelectEventIO::initSets(Sets &sets) const
+void SelectEventIO::prepareWait(Sets &sets) const
 {
 	std::map<int, e_Event>::const_iterator it;
-	for (it = _set.begin(); it != _set.end(); ++it)
+	for (it = _events.begin(); it != _events.end(); ++it)
 	{
 		if (it->second & E_IN)
 			FD_SET(it->first, &sets._readfds);
@@ -168,9 +171,9 @@ void SelectEventIO::initSets(Sets &sets) const
  *
  * @param sets Populated Sets structure from select(2).
  */
-void SelectEventIO::updateSets(Sets &sets)
+void SelectEventIO::processResults(Sets &sets)
 {
-	_set.clear();
+	_ready.clear();
 	for (int fd = 0; fd < _nfds; ++fd)
 	{
 		e_Event mask = E_NONE;
@@ -181,7 +184,7 @@ void SelectEventIO::updateSets(Sets &sets)
 		if (FD_ISSET(fd, &sets._exceptfds))
 			mask = static_cast<e_Event>(mask | E_EXCEPT);
 		if (mask)
-			_set[fd] = mask;
+			_ready[fd] = mask;
 	}
 }
 
