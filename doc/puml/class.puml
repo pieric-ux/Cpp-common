@@ -250,6 +250,17 @@ namespace common.core.raii {
 		+ operator[](i : int) : T&
 	}
 
+	class "UniqueFd" as UniqueFd [[classcommon_1_1core_1_1raii_1_1_unique_fd.html]] {
+		- _fd : int
+		--
+		+ UniqueFd(fd : int)
+		+ get() : int
+		+ valid() : bool
+		+ release() : int
+		+ reset(fd : int) : void
+		+ swap(other : UniqueFd&) : void
+	}
+
 	class "WeakPtr<T>" as WeakPtrT <<template>> [[classcommon_1_1core_1_1raii_1_1_weak_ptr.html]]{
 		- _cb : SharedPtrControlBlock
 		--
