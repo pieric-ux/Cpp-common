@@ -49,6 +49,20 @@ std::string trim(const std::string &str)
 	return (std::string (it, rit.base()));
 }
 
+/**
+ * @brief Converts all characters of a string to lowercase.
+ *
+ * @param str The string to convert.
+ * @return A new string with all characters in lowercase.
+ */
+std::string toLower(const std::string &str)
+{
+	std::string out(str);
+	for (std::size_t i = 0; i < out.size(); ++i)
+		out[i] = static_cast<char>(std::tolower(static_cast<unsigned char>(out[i])));
+	return out;
+}
+
 } // !utils
 } // !core
 } // !common
