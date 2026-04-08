@@ -1,52 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   common.hpp                                         :+:      :+:    :+:   */
+/*   urlUtils.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
 /*                                                     #+#    #+#             */
-/*   Created: 2025/10/16                              ###   ########.fr       */
+/*   Created: 2026/04/08                              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef COMMON_COMMON_HPP
-#define COMMON_COMMON_HPP
+#ifndef COMMON_URLUTILS_HPP
+#define COMMON_URLUTILS_HPP
 
-/**
- * @file common.hpp
- * @brief Common header aggregating core utilities and loader functionality.
- *
- * This header includes various utility and RAII classes, as well as the loader interface,
- * to provide convenient access to commonly used components throughout the project.
- */
 
-#include <common/core/io/EventFactoryIO.hpp>
-#include <common/core/io/IEventIO.hpp>
-#include <common/core/io/PollEventIO.hpp>
-#include <common/core/io/SelectEventIO.hpp>
+#include <string>
 
-#include <common/core/net/address/GetNameInfo.hpp>
-#include <common/core/net/address/GetAddrinfo.hpp>
-#include <common/core/net/sockets/TcpClient.hpp>
-#include <common/core/net/sockets/TcpServer.hpp>
+namespace common
+{
+namespace core
+{
+namespace utils
+{
 
-#include <common/core/raii/Deleters.hpp>
-#include <common/core/raii/SharedPtr.hpp>
-#include <common/core/raii/WeakPtr.hpp>
-#include <common/core/raii/UniquePtr.hpp>
-#include <common/core/raii/UniqueFd.hpp>
+std::string urlDecode(const std::string &encoded);
 
-#include <common/core/utils/algoUtils.hpp>
-#include <common/core/utils/Directory.hpp>
-#include <common/core/utils/fileUtils.hpp>
-#include <common/core/utils/stringUtils.hpp>
-#include <common/core/utils/timeUtils.hpp>
-#include <common/core/utils/urlUtils.hpp>
+} // !utils
+} // !core
+} // !common
 
-#include <common/loader/Loader.hpp>
-
-#endif // !COMMON_COMMON_HPP
+#endif // !COMMON_URLUTILS_HPP
 
 /* ************************************************************************** */
 /*                                                                            */

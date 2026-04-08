@@ -39,7 +39,7 @@ SRCES = EventFactoryIO.cpp SelectEventIO.cpp PollEventIO.cpp \
 		ASocket.cpp ATcpSocket.cpp TcpClient.cpp TcpServer.cpp \
 		GetAddrinfo.cpp \
 		SharedPtr.cpp \
-		Directory.cpp fileUtils.cpp stringUtils.cpp timeUtils.cpp \
+		Directory.cpp fileUtils.cpp stringUtils.cpp timeUtils.cpp urlUtils.cpp \
 		Loader.cpp
 
 OBJS_SRCES = $(addprefix $(OBJDIR)/, $(SRCES:.cpp=.o))

@@ -1,52 +1,64 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   common.hpp                                         :+:      :+:    :+:   */
+/*   urlUtils.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
 /*                                                     #+#    #+#             */
-/*   Created: 2025/10/16                              ###   ########.fr       */
+/*   Created: 2026/04/08                              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef COMMON_COMMON_HPP
-#define COMMON_COMMON_HPP
+#include <string>
+#include <cctype>
+
+namespace common
+{
+namespace core
+{
+namespace utils
+{
 
 /**
- * @file common.hpp
- * @brief Common header aggregating core utilities and loader functionality.
+ * @brief Decode percent-encoded characters (%XX) in a URI path.
  *
- * This header includes various utility and RAII classes, as well as the loader interface,
- * to provide convenient access to commonly used components throughout the project.
+ * @param encoded [TODO:parameter]
+ * @return [TODO:return]
  */
+std::string	urlDecode(const std::string &encoded)
+{
+	std::string result;
+	result.reserve(encoded.size());
 
-#include <common/core/io/EventFactoryIO.hpp>
-#include <common/core/io/IEventIO.hpp>
-#include <common/core/io/PollEventIO.hpp>
-#include <common/core/io/SelectEventIO.hpp>
+	std::string::const_iterator it = encoded.begin();
+	for (; it != encoded.end(); ++it)
+	{
+		if (*it == '%' && std::distance(it, encoded.end()) >= 2)
+		{
+			char msb = *(it + 1);
+			char lsb = *(it + 2);
 
-#include <common/core/net/address/GetNameInfo.hpp>
-#include <common/core/net/address/GetAddrinfo.hpp>
-#include <common/core/net/sockets/TcpClient.hpp>
-#include <common/core/net/sockets/TcpServer.hpp>
+			bool msbHex = (std::isdigit(msb) || std::isxdigit(msb));
+			bool lsbHex = (std::isdigit(lsb) || std::isxdigit(lsb));
 
-#include <common/core/raii/Deleters.hpp>
-#include <common/core/raii/SharedPtr.hpp>
-#include <common/core/raii/WeakPtr.hpp>
-#include <common/core/raii/UniquePtr.hpp>
-#include <common/core/raii/UniqueFd.hpp>
+			if (msbHex && lsbHex)
+			{
+				char hex[3] = { msb, lsb, '\0' };
+				result += static_cast<char>(std::strtol(hex, NULL, 16));
+				it += 2;
+				continue;
+			}
+		}
+		result += *it;
+	}
 
-#include <common/core/utils/algoUtils.hpp>
-#include <common/core/utils/Directory.hpp>
-#include <common/core/utils/fileUtils.hpp>
-#include <common/core/utils/stringUtils.hpp>
-#include <common/core/utils/timeUtils.hpp>
-#include <common/core/utils/urlUtils.hpp>
+	return result;
+}
 
-#include <common/loader/Loader.hpp>
-
-#endif // !COMMON_COMMON_HPP
+} // !utils
+} // !core
+} // !common
 
 /* ************************************************************************** */
 /*                                                                            */
