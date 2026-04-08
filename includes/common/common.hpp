@@ -35,6 +35,7 @@
 #include <common/core/raii/SharedPtr.hpp>
 #include <common/core/raii/WeakPtr.hpp>
 #include <common/core/raii/UniquePtr.hpp>
+#include <common/core/raii/UniqueFd.hpp>
 
 #include <common/core/utils/algoUtils.hpp>
 #include <common/core/utils/Directory.hpp>
