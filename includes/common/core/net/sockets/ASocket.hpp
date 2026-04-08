@@ -20,6 +20,7 @@
 
 #include <common/core/net/sockets/ISocket.hpp>
 #include <common/core/raii/UniquePtr.hpp>
+#include <common/core/raii/UniqueFd.hpp>
 #include <cerrno>
 #include <cstring>
 #include <stdexcept>
@@ -151,41 +152,41 @@ class ASocket : public ISocket
 		}
 
 	protected:
-		/**
-		 * @class SocketFdRAII
-		 * @brief RAII wrapper for a socket file descriptor.
-		 *
-		 * Owns a socket file descriptor and closes it automatically on destruction.
-		 * Non-copyable to enforce unique ownership.
-		 *
-		 * @startuml
-		 * class "SocketFdRAII" as SocketFdRAII {
-				- _fdRef : int
-				--
-				+ SocketFdRAII(init_fd : int)
-				+ get() : int
-				+ set(new_fd : int) : void
-			}
-		 * @enduml
-		 */
-		class SocketFdRAII
-		{
-			public:
-				explicit SocketFdRAII(int init_fd);
-				~SocketFdRAII();
+		// /**
+		//  * @class SocketFdRAII
+		//  * @brief RAII wrapper for a socket file descriptor.
+		//  *
+		//  * Owns a socket file descriptor and closes it automatically on destruction.
+		//  * Non-copyable to enforce unique ownership.
+		//  *
+		//  * @startuml
+		//  * class "SocketFdRAII" as SocketFdRAII {
+		// 		- _fdRef : int
+		// 		--
+		// 		+ SocketFdRAII(init_fd : int)
+		// 		+ get() : int
+		// 		+ set(new_fd : int) : void
+		// 	}
+		//  * @enduml
+		//  */
+		// class SocketFdRAII
+		// {
+		// 	public:
+		// 		explicit SocketFdRAII(int init_fd);
+		// 		~SocketFdRAII();
 
-				int get() const;
-				void set(int new_fd);
+		// 		int get() const;
+		// 		void set(int new_fd);
 				
-			private:
-				SocketFdRAII(const SocketFdRAII &rhs);
-				SocketFdRAII &operator=(const SocketFdRAII &rhs);
+		// 	private:
+		// 		SocketFdRAII(const SocketFdRAII &rhs);
+		// 		SocketFdRAII &operator=(const SocketFdRAII &rhs);
 
-				int _fdRef;
-		};
+		// 		int _fdRef;
+		// };
 
-		common::core::raii::UniquePtr<SocketFdRAII> _fd;
-		bool										_isNonblock;
+		common::core::raii::UniqueFd	_fd;
+		bool							_isNonblock;
 
 	private:
 		int	getFlags() const;

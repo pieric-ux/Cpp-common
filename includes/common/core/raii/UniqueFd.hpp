@@ -1,51 +1,116 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   common.hpp                                         :+:      :+:    :+:   */
+/*   UniqueFd.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pdemont <pdemont@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*   By: blucken <blucken@student.42lausanne.ch>  +#+#+#+#+#+   +#+           */
 /*                                                     #+#    #+#             */
-/*   Created: 2025/10/16                              ###   ########.fr       */
+/*   Created: 2026/04/08                              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef COMMON_COMMON_HPP
-#define COMMON_COMMON_HPP
+#ifndef COMMON_UNIQUE_FD_HPP
+#define COMMON_UNIQUE_FD_HPP
 
 /**
- * @file common.hpp
- * @brief Common header aggregating core utilities and loader functionality.
- *
- * This header includes various utility and RAII classes, as well as the loader interface,
- * to provide convenient access to commonly used components throughout the project.
+ * @file UniqueFd.hpp
+ * @brief Generic RAII wrapper around a POSIX file descriptor.
  */
 
-#include <common/core/io/EventFactoryIO.hpp>
-#include <common/core/io/IEventIO.hpp>
-#include <common/core/io/PollEventIO.hpp>
-#include <common/core/io/SelectEventIO.hpp>
+#include <unistd.h>
 
-#include <common/core/net/address/GetNameInfo.hpp>
-#include <common/core/net/address/GetAddrinfo.hpp>
-#include <common/core/net/sockets/TcpClient.hpp>
-#include <common/core/net/sockets/TcpServer.hpp>
+namespace common
+{
+namespace core
+{
+namespace raii
+{
 
-#include <common/core/raii/Deleters.hpp>
-#include <common/core/raii/SharedPtr.hpp>
-#include <common/core/raii/WeakPtr.hpp>
-#include <common/core/raii/UniquePtr.hpp>
-#include <common/core/raii/UniqueFd.hpp>
+/**
+ * @brief Owning RAII guard for a single POSIX file descriptor.
+ *
+ * Holds an int directly (no heap allocation, no template, no deleter
+ * indirection) and calls ::close on destruction iff the held value is
+ * non-negative. A value of -1 acts as the empty / released sentinel,
+ * making default construction and post-release destruction safe.
+ *
+ * Non-copyable: copy constructor and copy assignment are declared
+ * private and intentionally not defined, expressing unique ownership
+ * in C++98 without relying on move semantics. Use release() / reset()
+ * / swap() to transfer ownership between guards.
+ *
+ * Intended for any POSIX fd source: open(), socket(), accept(),
+ * pipe(), dup(), etc. All methods are throw().
+ *
+ * @startuml
+ * class "UniqueFd" as UniqueFd {
+		- _fd : int
+		--
+		+ UniqueFd(fd : int)
+		+ get() : int
+		+ valid() : bool
+		+ release() : int
+		+ reset(fd : int) : void
+		+ swap(other : UniqueFd&) : void
+	}
+ * @enduml
+ */
+class UniqueFd
+{
+public:
+	explicit UniqueFd(int fd = -1) throw() : _fd(fd) {}
 
-#include <common/core/utils/algoUtils.hpp>
-#include <common/core/utils/Directory.hpp>
-#include <common/core/utils/fileUtils.hpp>
-#include <common/core/utils/stringUtils.hpp>
-#include <common/core/utils/timeUtils.hpp>
+	~UniqueFd() throw()
+	{
+		if (_fd >= 0)
+			::close(_fd);
+	}
 
-#include <common/loader/Loader.hpp>
+	int		get() const throw()
+	{
+		return _fd;
+	}
+	
+	bool	valid() const throw()
+	{
+		return _fd >= 0;
+	}
 
-#endif // !COMMON_COMMON_HPP
+	int		release() throw()
+	{
+		int fd = _fd;
+		_fd = -1;
+		return fd;
+	}
+
+	void	reset(int fd = -1) throw()
+	{
+		if (_fd != fd && _fd >= 0)
+			::close(_fd);
+		_fd = fd;
+	}
+
+	void	swap(UniqueFd &other) throw()
+	{
+		int tmp = _fd;
+		_fd = other._fd;
+		other._fd = tmp;
+	}
+
+private:
+	int		_fd;
+
+	UniqueFd(const UniqueFd &);
+	UniqueFd &operator=(const UniqueFd &);
+};
+
+inline void swap(UniqueFd &a, UniqueFd &b) throw() { a.swap(b); }
+
+} // !raii
+} // !core
+} // !common
+#endif // !COMMON_UNIQUE_FD_HPP
 
 /* ************************************************************************** */
 /*                                                                            */
