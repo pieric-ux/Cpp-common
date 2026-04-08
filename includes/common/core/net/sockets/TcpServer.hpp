@@ -83,7 +83,7 @@ class TcpServer : public ATcpSocket
 		{
 			T addr = {};
 			socklen_t len = sizeof(T);
-			int cfd = ::accept(_fd->get(), reinterpret_cast<struct sockaddr *>(&addr), &len);
+			int cfd = ::accept(_fd.get(), reinterpret_cast<struct sockaddr *>(&addr), &len);
 			if (cfd == -1)
 				throw std::runtime_error("accept failed: " + std::string(std::strerror(errno)));
 			TcpClient cs(cfd);

@@ -93,7 +93,7 @@ class ASocket : public ISocket
 		{
 			T addr = {};
 			socklen_t len = sizeof(T);
-			if (::getsockname(_fd->get(), reinterpret_cast<struct sockaddr *>(&addr), &len) == -1)
+			if (::getsockname(_fd.get(), reinterpret_cast<struct sockaddr *>(&addr), &len) == -1)
 				throw std::runtime_error("getsockname failed: " + std::string(std::strerror(errno)));
 			return (addr);
 		}
@@ -110,7 +110,7 @@ class ASocket : public ISocket
 		{
 			T addr = {};
 			socklen_t len = sizeof(T);
-			if (::getpeername(_fd->get(), reinterpret_cast<struct sockaddr *>(&addr), &len) == -1)
+			if (::getpeername(_fd.get(), reinterpret_cast<struct sockaddr *>(&addr), &len) == -1)
 				throw std::runtime_error("getpeername failed: " + std::string(std::strerror(errno)));
 			return (addr);
 		}
@@ -129,7 +129,7 @@ class ASocket : public ISocket
 		{
 			T optval = {};
 			socklen_t len = sizeof(T);
-			if (::getsockopt(_fd->get(), level, optname, &optval, &len) == -1)
+			if (::getsockopt(_fd.get(), level, optname, &optval, &len) == -1)
 				throw std::runtime_error("getsockopt failed: " + std::string(std::strerror(errno)));
 			return (optval);
 		}
@@ -146,7 +146,7 @@ class ASocket : public ISocket
 		template<typename T>
 		void	setsockopt(int optname, const T &optval, int level = SOL_SOCKET)
 		{
-			if (::setsockopt(_fd->get(), level, optname, &optval, sizeof(T)) == -1)
+			if (::setsockopt(_fd.get(), level, optname, &optval, sizeof(T)) == -1)
 				throw std::runtime_error("setsockopt failed: " + std::string(std::strerror(errno)));
 		}
 
