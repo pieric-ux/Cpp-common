@@ -80,7 +80,7 @@ TcpServer &TcpServer::operator=(const TcpServer &rhs)
  */
 void	TcpServer::listen(int backlog)
 {
-	if (::listen(_fd->get(), backlog) == -1)
+	if (::listen(_fd.get(), backlog) == -1)
 		throw std::runtime_error("listen failed: " + std::string(std::strerror(errno)));
 }
 

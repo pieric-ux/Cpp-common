@@ -16,6 +16,7 @@
  */
 
 #include <common/core/net/sockets/ASocket.hpp>
+#include <common/core/raii/UniqueFd.hpp>
 #include <cerrno>
 #include <cstring>
 #include <stdexcept>
@@ -31,58 +32,58 @@ namespace core
 namespace net
 {
 
-/**
- * @brief RAII wrapper for socket file descriptor.
- *
- * Manages the lifecycle of a socket file descriptor with automatic cleanup.
- *
- * @param init_fd Initial socket file descriptor.
- */
-ASocket::SocketFdRAII::SocketFdRAII(int init_fd) : _fdRef(init_fd) {}
+// /**
+//  * @brief RAII wrapper for socket file descriptor.
+//  *
+//  * Manages the lifecycle of a socket file descriptor with automatic cleanup.
+//  *
+//  * @param init_fd Initial socket file descriptor.
+//  */
+// ASocket::SocketFdRAII::SocketFdRAII(int init_fd) : _fdRef(init_fd) {}
 
-/**
- * @brief Destructor. Closes the socket file descriptor if it's valid.
- */
-ASocket::SocketFdRAII::~SocketFdRAII()
-{
-	if (_fdRef != -1)
-	{
-		::close(_fdRef);
-		_fdRef = -1;
-	}
-}
+// /**
+//  * @brief Destructor. Closes the socket file descriptor if it's valid.
+//  */
+// ASocket::SocketFdRAII::~SocketFdRAII()
+// {
+// 	if (_fdRef != -1)
+// 	{
+// 		::close(_fdRef);
+// 		_fdRef = -1;
+// 	}
+// }
 
-/**
- * @brief Gets the socket file descriptor.
- *
- * @return The file descriptor value, or -1 if invalid.
- */
-int	ASocket::SocketFdRAII::get() const
-{
-	return (_fdRef);
-}
+// /**
+//  * @brief Gets the socket file descriptor.
+//  *
+//  * @return The file descriptor value, or -1 if invalid.
+//  */
+// int	ASocket::SocketFdRAII::get() const
+// {
+// 	return (_fdRef);
+// }
 
-/**
- * @brief Sets a new socket file descriptor.
- *
- * @param new_fd The new file descriptor to store.
- */
-void	ASocket::SocketFdRAII::set(int new_fd)
-{
-	_fdRef = new_fd;
-}
+// /**
+//  * @brief Sets a new socket file descriptor.
+//  *
+//  * @param new_fd The new file descriptor to store.
+//  */
+// void	ASocket::SocketFdRAII::set(int new_fd)
+// {
+// 	_fdRef = new_fd;
+// }
 
 /**
  * @brief Default constructor. Creates an invalid socket.
  */
-ASocket::ASocket() : _fd(new SocketFdRAII(-1)), _isNonblock(false) {}
+ASocket::ASocket() : _fd(), _isNonblock(false) {}
 
 /**
  * @brief Constructor from an existing file descriptor.
  *
  * @param init_fd Existing socket file descriptor to manage.
  */
-ASocket::ASocket(int init_fd) : _fd(new SocketFdRAII(init_fd))
+ASocket::ASocket(int init_fd) : _fd(init_fd)
 {
 	int flags = getFlags();
 
@@ -98,12 +99,11 @@ ASocket::ASocket(int init_fd) : _fd(new SocketFdRAII(init_fd))
  * @param isNonblock Whether to set the socket as non-blocking.
  * @throw std::runtime_error If socket creation fails.
  */
-ASocket::ASocket(int domain, int type, int protocol, bool isNonblock) : _fd(new SocketFdRAII(-1))
+ASocket::ASocket(int domain, int type, int protocol, bool isNonblock) : _fd(::socket(domain, type, protocol))
 {
-	int fd = ::socket(domain, type, protocol);
-	if (fd == -1)
+
+	if (_fd.valid() == false)
 		throw std::runtime_error("socket failed: " + std::string(std::strerror(errno)));
-	_fd->set(fd);
 
 	if (isNonblock)
 		setIsNonblock(isNonblock);
@@ -147,7 +147,7 @@ ASocket &ASocket::operator=(const ASocket &rhs)
  */
 void	ASocket::bind(const struct sockaddr *addr, socklen_t addrlen)
 {
-	if (::bind(_fd->get(), addr, addrlen) == -1)
+	if (::bind(_fd.get(), addr, addrlen) == -1)
 		throw std::runtime_error("bind failed: " + std::string(std::strerror(errno)));
 }
 
@@ -158,7 +158,7 @@ void	ASocket::bind(const struct sockaddr *addr, socklen_t addrlen)
  */
 int	ASocket::getFd() const
 {
-	return (_fd->get());
+	return (_fd.get());
 }
 
 /**
@@ -183,12 +183,12 @@ void	ASocket::setIsNonblock(bool isNonblock)
 
 	if (!_isNonblock && isNonblock)
 	{
-		if (::fcntl(_fd->get(), F_SETFL, flags | O_NONBLOCK) == -1)
+		if (::fcntl(_fd.get(), F_SETFL, flags | O_NONBLOCK) == -1)
 			throw std::runtime_error("fcntl failed: " + std::string(std::strerror(errno)));
 	}
 	else if (_isNonblock && !isNonblock)
 	{
-		if (::fcntl(_fd->get(), F_SETFL, flags & ~O_NONBLOCK) == -1)
+		if (::fcntl(_fd.get(), F_SETFL, flags & ~O_NONBLOCK) == -1)
 			throw std::runtime_error("fcntl failed: " + std::string(std::strerror(errno)));
 	}
 	_isNonblock = isNonblock;
@@ -201,10 +201,10 @@ void	ASocket::setIsNonblock(bool isNonblock)
  */
 void	ASocket::close()
 {
-	if (_fd->get() != -1)
-		if (::close(_fd->get()) == -1)
+	if (_fd.get() != -1)
+		if (::close(_fd.get()) == -1)
 			throw std::runtime_error("close failed " + std::string(std::strerror(errno)));
-	_fd->set(-1);
+	_fd.reset();
 }
 
 /**
@@ -215,7 +215,7 @@ void	ASocket::close()
  */
 void	ASocket::shutdown(int how)
 {
-	if (::shutdown(_fd->get(), how) == -1)
+	if (::shutdown(_fd.get(), how) == -1)
 		throw std::runtime_error("shutdown failed: " + std::string(std::strerror(errno)));
 }
 
@@ -227,7 +227,7 @@ void	ASocket::shutdown(int how)
  */
 int	ASocket::getFlags() const
 {
-	int flags = fcntl(_fd->get(), F_GETFL);
+	int flags = fcntl(_fd.get(), F_GETFL);
 	if (flags == -1)
 		throw std::runtime_error("fcntl failed: " + std::string(std::strerror(errno)));
 

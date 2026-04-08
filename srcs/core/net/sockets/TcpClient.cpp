@@ -82,7 +82,7 @@ TcpClient &TcpClient::operator=(const TcpClient &rhs)
  */
 void	TcpClient::connect(const struct sockaddr *addr, socklen_t addrlen)
 {
-	if (::connect(_fd->get(), addr, addrlen) == -1)
+	if (::connect(_fd.get(), addr, addrlen) == -1)
 		throw std::runtime_error("connect failed: " + std::string(std::strerror(errno)));
 }
 
