@@ -72,6 +72,16 @@ public:
 		return _fd;
 	}
 	
+	void	set(int fd) throw()
+	{
+		if (_fd != fd)
+		{
+			if (_fd >= 0)
+				::close(_fd);
+			_fd = fd;
+		}
+	}
+	
 	bool	valid() const throw()
 	{
 		return _fd >= 0;
