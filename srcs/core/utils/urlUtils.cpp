@@ -12,6 +12,7 @@
 
 #include <string>
 #include <cctype>
+#include <cstdlib>
 
 namespace common
 {
